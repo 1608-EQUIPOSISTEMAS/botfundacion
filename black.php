@@ -297,6 +297,11 @@ try {
                                         <i class="mdi mdi-pencil-outline"></i>
                                         Gestionar Respuestas
                                     </button>
+                                    <button class="btn btn-primary" data-toggle="modal" data-target="#editarModalPago"
+                                        data-id="<?= htmlspecialchars($member['id']) ?>">
+                                        <i class="mdi mdi-pencil-outline"></i>
+                                        Gestionar Pagos
+                                    </button>
                                 </section>
 
                                 <section class="plan-card">

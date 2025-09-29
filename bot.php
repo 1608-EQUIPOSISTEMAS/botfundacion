@@ -67,32 +67,154 @@ try {
     <link rel="shortcut icon" href="assets/images/favicon.png" />
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css" rel="stylesheet">
     
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css">
+    
     <style>
-        .btn-whatsapp {
-            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+        /* Header moderno */
+        .modern-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1rem 0;
+        }
+
+        .modern-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .role-badge-modern {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.25rem;
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid #06b6d4;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #06b6d4;
+        }
+
+        .role-badge-modern.admin {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: #8b5cf6;
+            color: #a78bfa;
+        }
+
+        .role-badge-modern.foundation {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: #10b981;
+            color: #34d399;
+        }
+
+        .role-badge-modern.comercial {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: #f59e0b;
+            color: #fbbf24;
+        }
+
+        /* Botón WhatsApp moderno */
+        .btn-whatsapp-modern {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: #25d366;
+            color: white;
             border: none;
-            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
-            transition: all 0.3s ease;
-        }
-        
-        .btn-whatsapp:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
-            background: linear-gradient(135deg, #128C7E 0%, #075E54 100%);
-        }
-
-        .user-role-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 12px;
+            border-radius: 10px;
             font-weight: 600;
-            margin-left: 10px;
+            font-size: 0.9375rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(37, 211, 102, 0.3);
         }
 
-        .role-admin { background: #007bff; color: white; }
-        .role-foundation { background: #28a745; color: white; }
-        .role-comercial { background: #fd7e14; color: white; }
+        .btn-whatsapp-modern:hover {
+            background: #22c55e;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(37, 211, 102, 0.4);
+        }
+
+        .btn-whatsapp-modern.loading {
+            background: #f59e0b;
+            pointer-events: none;
+        }
+
+        .btn-whatsapp-modern.connected {
+            background: #10b981;
+        }
+
+        .btn-whatsapp-modern.error {
+            background: #ef4444;
+        }
+
+        /* Línea separadora */
+        .separator-line {
+            height: 2px;
+            background: linear-gradient(to right, transparent, #e0e0e0 20%, #e0e0e0 80%, transparent);
+            margin: 1.5rem 0;
+            border: none;
+        }
+
+        /* Estilos para DataTables */
+        .dataTables_wrapper .dataTables_filter input {
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            padding: 0.375rem 0.75rem;
+            margin-left: 0.5rem;
+        }
+
+        .dataTables_wrapper .dataTables_length select {
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            padding: 0.375rem 0.75rem;
+            margin: 0 0.5rem;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: #007bff !important;
+            color: white !important;
+            border-color: #007bff !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: #0056b3 !important;
+            color: white !important;
+            border-color: #0056b3 !important;
+        }
+
+        /* Animación spin */
+        @keyframes mdi-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .mdi-spin {
+            animation: mdi-spin 1s linear infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .modern-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .modern-header h1 {
+                font-size: 1.5rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -104,49 +226,51 @@ try {
             
             <div class="main-panel">
                 <div class="content-wrapper">
-                    <div class="page-header">
-                        <h3 class="page-title">
-                            Mensaje de Bienvenida
-                            <?php if ($user_role): ?>
-                                <span class="user-role-badge role-<?php echo htmlspecialchars($role_class); ?>">
-                                    ROL: <?php echo htmlspecialchars($role_name); ?> (ID: <?php echo $user_role; ?>)
-                                </span>
-                            <?php else: ?>
-                                <span class="user-role-badge role-default">
-                                    SIN ROL ASIGNADO
-                                </span>
+                    <!-- Header Unificado - Todo en uno -->
+                    <div class="card" style="border-radius: 20px; box-shadow: 0 4px 16px rgba(6,182,212,0.08);">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <!-- Título y Badge -->
+                                <div class="d-flex align-items-center gap-3">
+                                    <h1 class="mb-0" style="font-size: 1.75rem; font-weight: 600; display: flex; align-items: center; gap: 0.75rem;">
+                                        <i class="mdi mdi-robot"></i>
+                                        Bot de WhatsApp
+                                    </h1>
+                                    <?php if ($user_role): ?>
+                                        <span style="margin-left: 8px;" class="role-badge-modern <?php echo htmlspecialchars($role_class); ?>">
+                                            <i class="mdi mdi-shield-check"></i>
+                                            <?php echo htmlspecialchars($role_name); ?>
+                                        </span>
+                                    <?php else: ?>
+                                        <span style="margin-left: 8px;" class="role-badge-modern">
+                                            <i class="mdi mdi-alert"></i>
+                                            Sin Rol Asignado
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                                
+                                <!-- Botón WhatsApp -->
+                                <button id="startWhatsAppBtn" class="btn-whatsapp-modern">
+                                    <i class="mdi mdi-whatsapp"></i>
+                                    <span id="btnText">Iniciar Bot</span>
+                                </button>
+                            </div>
+
+                            <?php if (!empty($user_permissions)): ?>
+                                <p class="text-muted mb-0 mt-2" style="font-size: 0.875rem;">
+                                </p>
                             <?php endif; ?>
-                        </h3>
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="#">Tables</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">Configuraciones</li>
-                            </ol>
-                        </nav>
+                        </div>
                     </div>
 
+                    <!-- Línea Separadora -->
+                    <hr class="separator-line">
+
+                    <!-- Tabla -->
                     <div class="row">
                         <div class="col-lg-12 grid-margin stretch-card">
-                            <div class="card">
+                            <div class="card" style="border-radius: 20px; box-shadow: 0 4px 16px rgba(6,182,212,0.08);">
                                 <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <div>
-                                            <h4 class="card-title">Tabla de Configuraciones</h4>
-                                            <p class="card-description">
-                                                Configuraciones del sistema
-                                                <?php if (!empty($user_permissions)): ?>
-                                                    - Permisos: <?php echo implode(', ', $user_permissions); ?>
-                                                <?php endif; ?>
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <button id="startWhatsAppBtn" class="btn btn-whatsapp btn-rounded d-flex align-items-center justify-content-center" style="color: white;">
-                                                <i class="mdi mdi-whatsapp mr-2"></i>
-                                                <span id="btnText">Iniciar WhatsApp Bot</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    
                                     <?php if (isset($error_message)): ?>
                                         <div class="alert alert-danger">
                                             <i class="mdi mdi-alert-circle mr-2"></i>
@@ -155,13 +279,13 @@ try {
                                     <?php endif; ?>
                                     
                                     <div class="table-responsive">
-                                        <table class="table table-bordered table-hover">
+                                        <table id="configuracionesTable" class="table table-bordered table-hover" style="width:100%">
                                             <thead class="thead-light">
                                                 <tr>
-                                                    <th><i class="mdi mdi-pound mr-1"></i> ID </th>
-                                                    <th><i class="mdi mdi-key mr-1"></i> Palabra Clave </th>
-                                                    <th><i class="mdi mdi-message-text mr-1"></i> Mensaje de Bienvenida </th>
-                                                    <th><i class="mdi mdi-cogs mr-1"></i> Acciones </th>
+                                                    <th><i class="mdi mdi-pound mr-1"></i> ID</th>
+                                                    <th><i class="mdi mdi-key mr-1"></i> Palabra Clave</th>
+                                                    <th><i class="mdi mdi-message-text mr-1"></i> Mensaje de Bienvenida</th>
+                                                    <th><i class="mdi mdi-cogs mr-1"></i> Acciones</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -175,7 +299,7 @@ try {
                                                                 </span>
                                                             </td>
                                                             <td>
-                                                                <div style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" 
+                                                                <div style="max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" 
                                                                      title="<?php echo htmlspecialchars($config['mensaje_bienvenida']); ?>">
                                                                     <?php echo htmlspecialchars($config['mensaje_bienvenida']); ?>
                                                                 </div>
@@ -225,6 +349,12 @@ try {
     <script src="assets/js/misc.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
     
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
+    
     <script>
         // Configuración del rol del usuario desde PHP
         const USER_ROLE = <?php echo json_encode($user_role); ?>;
@@ -243,6 +373,22 @@ try {
         let qrLibraryLoaded = false;
         let checkingQR = false;
         let whatsappConnected = false;
+
+        // Inicializar DataTable
+        $(document).ready(function() {
+            $('#configuracionesTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+                },
+                "responsive": true,
+                "pageLength": 10,
+                "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+                "order": [[0, "desc"]],
+                "columnDefs": [
+                    { "orderable": false, "targets": 3 }
+                ]
+            });
+        });
 
         function loadQRLibrary() {
             return new Promise((resolve, reject) => {
@@ -305,29 +451,33 @@ try {
         function updateButtonState(state, text) {
             const btn = document.getElementById('startWhatsAppBtn');
             const btnText = document.getElementById('btnText');
+            const icon = btn.querySelector('i');
             
-            btn.className = 'btn btn-rounded d-flex align-items-center justify-content-center';
+            btn.className = 'btn-whatsapp-modern';
             
             switch(state) {
                 case 'loading':
-                    btn.classList.add('btn-warning');
+                    btn.classList.add('loading');
                     btn.disabled = true;
-                    btnText.innerHTML = '<i class="mdi mdi-loading mdi-spin mr-2"></i>' + text;
+                    btnText.textContent = text;
+                    icon.className = 'mdi mdi-loading mdi-spin';
                     break;
                 case 'connected':
-                    btn.classList.add('btn-success');
+                    btn.classList.add('connected');
                     btn.disabled = false;
-                    btnText.innerHTML = '<i class="mdi mdi-check-circle mr-2"></i>' + text;
+                    btnText.textContent = text;
+                    icon.className = 'mdi mdi-check-circle';
                     break;
                 case 'error':
-                    btn.classList.add('btn-danger');
+                    btn.classList.add('error');
                     btn.disabled = false;
-                    btnText.innerHTML = '<i class="mdi mdi-alert-circle mr-2"></i>' + text;
+                    btnText.textContent = text;
+                    icon.className = 'mdi mdi-alert-circle';
                     break;
                 default:
-                    btn.classList.add('btn-whatsapp');
                     btn.disabled = false;
-                    btnText.innerHTML = '<i class="mdi mdi-whatsapp mr-2"></i>' + text;
+                    btnText.textContent = text;
+                    icon.className = 'mdi mdi-whatsapp';
             }
         }
 
@@ -346,7 +496,7 @@ try {
                 
                 if (data.status === 'connected') {
                     whatsappConnected = true;
-                    updateButtonState('connected', 'WhatsApp Conectado');
+                    updateButtonState('connected', 'Conectado');
                 }
             } catch (error) {
                 console.log('WhatsApp no está conectado inicialmente');
@@ -354,7 +504,6 @@ try {
         }
 
         document.getElementById('startWhatsAppBtn').addEventListener('click', async function() {
-            // Validar que el usuario tenga permisos
             if (!USER_PERMISSIONS || USER_PERMISSIONS.length === 0) {
                 Swal.fire({
                     title: 'Sin Permisos',
@@ -384,8 +533,8 @@ try {
             }
 
             Swal.fire({
-                title: 'Iniciando WhatsApp Bot',
-                html: `<p>Preparando la conexión...</p><p><small>Rol: ${USER_ROLE} | Permisos: ${USER_PERMISSIONS.join(', ')}</small></p>`,
+                title: 'Iniciando Bot',
+                html: '<p>Preparando la conexión...</p>',
                 icon: 'info',
                 allowOutsideClick: false,
                 showConfirmButton: false,
@@ -397,7 +546,6 @@ try {
             updateButtonState('loading', 'Iniciando...');
 
             try {
-                // ENVIAR EL ROL AL SERVIDOR NODE.JS
                 const response = await fetch('conexion/whatsapp_proxy.php?action=start', {
                     method: 'POST',
                     headers: {
@@ -433,9 +581,9 @@ try {
                         confirmButtonColor: '#007bff'
                     });
                     
-                    updateButtonState('error', 'Error de Conexión');
+                    updateButtonState('error', 'Error');
                     setTimeout(() => {
-                        updateButtonState('default', 'Iniciar WhatsApp Bot');
+                        updateButtonState('default', 'Iniciar Bot');
                     }, 3000);
                 }
             } catch (error) {
@@ -447,10 +595,10 @@ try {
                 });
                 
                 console.error('Error de conexión:', error);
-                updateButtonState('error', 'Error del Servidor');
+                updateButtonState('error', 'Error');
                 
                 setTimeout(() => {
-                    updateButtonState('default', 'Iniciar WhatsApp Bot');
+                    updateButtonState('default', 'Iniciar Bot');
                 }, 5000);
             }
         });
@@ -471,7 +619,7 @@ try {
                     title: 'WhatsApp Desconectado'
                 });
                 
-                updateButtonState('default', 'Iniciar WhatsApp Bot');
+                updateButtonState('default', 'Iniciar Bot');
                 $('#whatsappModal').modal('hide');
                 
             } catch (error) {
@@ -506,7 +654,7 @@ try {
                             
                             const qrContainer = document.getElementById('qrCode');
                             generateQRCode(qrContainer, data.qr);
-                            updateButtonState('loading', 'Esperando escaneo...');
+                            updateButtonState('loading', 'Esperando...');
                         }
                         break;
                         
@@ -516,12 +664,12 @@ try {
                         document.getElementById('whatsappReady').style.display = 'block';
                         
                         whatsappConnected = true;
-                        updateButtonState('connected', 'WhatsApp Conectado');
+                        updateButtonState('connected', 'Conectado');
                         checkingQR = false;
                         
                         Swal.fire({
                             title: '¡Conectado!',
-                            text: 'WhatsApp Bot funcionando con permisos: ' + USER_PERMISSIONS.join(', '),
+                            text: 'WhatsApp Bot funcionando correctamente',
                             icon: 'success',
                             timer: 2000,
                             showConfirmButton: false
@@ -542,7 +690,7 @@ try {
 
         document.getElementById('stopWhatsAppBtn').addEventListener('click', async function() {
             const result = await Swal.fire({
-                title: '¿Detener WhatsApp Bot?',
+                title: '¿Detener Bot?',
                 text: 'Se cerrará la conexión actual del bot',
                 icon: 'warning',
                 showCancelButton: true,
@@ -560,7 +708,7 @@ try {
         $('#whatsappModal').on('hidden.bs.modal', function () {
             if (!whatsappConnected) {
                 checkingQR = false;
-                updateButtonState('default', 'Iniciar WhatsApp Bot');
+                updateButtonState('default', 'Iniciar Bot');
             }
         });
     </script>
