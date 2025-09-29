@@ -364,6 +364,8 @@ try {
 
     <?php include 'modals/black/editar.php'; ?>
     <?php include 'modals/black/modal_opciones.php'; ?>
+    <?php include 'modals/black/modal_respuestas.php'; ?>
+
     
     <script src="assets/vendors/js/vendor.bundle.base.js"></script>
     <script src="assets/js/off-canvas.js"></script>

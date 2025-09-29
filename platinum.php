@@ -292,10 +292,15 @@ try {
                                         <i class="mdi mdi-pencil-outline"></i>
                                         Gestionar Opciones
                                     </button>
-                                    <button class="btn btn-primary" data-toggle="modal" data-target="#editarModal"
+                                    <button class="btn btn-primary" data-toggle="modal" data-target="#editarModalrespuestas"
                                         data-id="<?= htmlspecialchars($member['id']) ?>">
                                         <i class="mdi mdi-pencil-outline"></i>
                                         Gestionar Respuestas
+                                    </button>
+                                    <button class="btn btn-primary" data-toggle="modal" data-target="#editarModalPago"
+                                        data-id="<?= htmlspecialchars($member['id']) ?>">
+                                        <i class="mdi mdi-pencil-outline"></i>
+                                        Gestionar Pagos
                                     </button>
                                 </section>
 
@@ -359,6 +364,7 @@ try {
 
     <?php include 'modals/platinum/editar.php'; ?>
     <?php include 'modals/platinum/modal_opciones.php'; ?>
+    <?php include 'modals/platinum/modal_respuestas.php'; ?>
     
     <script src="assets/vendors/js/vendor.bundle.base.js"></script>
     <script src="assets/js/off-canvas.js"></script>
