@@ -414,6 +414,10 @@ $tasa_abandono = $total_inicio > 0 ? round(($funnel_foundation['abandonados'] / 
             --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.05);
         }
 
+        .chart-header-modern {
+    margin-bottom: 40px;  /* Cambia de 28px a 40px o más */
+}
+
         body {
             background: var(--bg-secondary);
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -994,11 +998,13 @@ $tasa_abandono = $total_inicio > 0 ? round(($funnel_foundation['abandonados'] / 
                     <div class="summary-cards">
                         <div class="summary-item">
                             <div class="summary-number"><?php echo number_format($total_core1); ?></div>
-                            <div class="summary-label">Core 1</div>
+                            <div class="summary-label">Linea 1</div>
+                            <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">+51 922 495 159</div>
                         </div>
                         <div class="summary-item">
                             <div class="summary-number"><?php echo number_format($total_core2); ?></div>
-                            <div class="summary-label">Core 2</div>
+                            <div class="summary-label">Linea 2</div>
+                            <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">+51 963 801 628</div>
                         </div>
                         <div class="summary-item">
                             <div class="summary-number"><?php echo number_format($total_sin_asignar); ?></div>
@@ -1025,8 +1031,8 @@ $tasa_abandono = $total_inicio > 0 ? round(($funnel_foundation['abandonados'] / 
                                 <span class="kpi-badge-minimal badge-info-minimal">
                                     <?php 
                                     switch($filtro_core) {
-                                        case 'core1': echo 'Core 1'; break;
-                                        case 'core2': echo 'Core 2'; break;
+                                        case 'core1': echo 'Linea 1'; break;
+                                        case 'core2': echo 'LInea 2'; break;
                                         case 'sin_asignar': echo 'Sin asignar'; break;
                                         default: echo 'Histórico';
                                     }
@@ -1455,15 +1461,15 @@ $tasa_abandono = $total_inicio > 0 ? round(($funnel_foundation['abandonados'] / 
                 labels: labelsCores,
                 datasets: [
                     {
-                        label: 'Core 1',
+                        label: 'Linea 1',
                         data: dataCore1Array,
                         backgroundColor: '#DBEAFE',
                         borderColor: '#3B82F6',
                         borderWidth: 2,
-                        borderRadius: 8
+                        borderRadius: 8,
                     },
                     {
-                        label: 'Core 2',
+                        label: 'Linea 2',
                         data: dataCore2Array,
                         backgroundColor: '#D1FAE5',
                         borderColor: '#10B981',
@@ -1586,7 +1592,7 @@ $tasa_abandono = $total_inicio > 0 ? round(($funnel_foundation['abandonados'] / 
         new Chart(ctxFunnel, {
             type: 'bar',
             data: {
-                labels: ['Modalidad', 'En vivo Tipo Pago', 'Completados', 'Abandonados', 'Sin Interacción'],
+                labels: ['Modalidad', 'Envio Tipo Pago', 'Completados', 'Abandonados', 'Sin Interacción'],
                 datasets: [{
                     label: 'Usuarios',
                     data: [
