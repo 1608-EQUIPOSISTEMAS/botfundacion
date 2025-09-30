@@ -100,6 +100,19 @@ function tieneRol($rol) {
                 <span class="menu-title">Fundación</span>
             </a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#online" aria-expanded="false" aria-controls="online">
+            <span class="icon-bg"><i class="mdi mdi-file-document-box"></i></span>
+            <span class="menu-title">Registros</span>
+            <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="online">
+            <ul class="nav flex-column sub-menu">
+                <li class="nav-item"><a class="nav-link" href="información.php">Información</a></li>
+                <li class="nav-item"><a class="nav-link" href="dashboardinfo.php">Dashboard</a></li>
+            </ul>
+            </div>
+        </li>
         <?php endif; ?>
 
         <!-- MEMBERS - Dropdown -->

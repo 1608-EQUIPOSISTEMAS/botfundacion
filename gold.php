@@ -276,7 +276,7 @@ try {
                                     </h3>
                                     </div>
 
-                                    <p class="price" style="padding-top: 1rem;"><?php echo formatWhatsappText($member['precio']); ?></p>
+                                    <p class="price" style="padding-top: 1rem; color: black;"><?php echo formatWhatsappText($member['precio']); ?></p>
                                     <button class="btn btn-primary" data-toggle="modal" data-target="#editarModal"
                                         data-id="<?= htmlspecialchars($member['id']) ?>"
                                         data-nombre="<?= htmlspecialchars($member['nombre']) ?>"
