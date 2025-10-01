@@ -78,6 +78,12 @@ function tieneRol($rol) {
                 <span class="menu-title">Conectar</span>
             </a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" href="programas.php">
+                <span class="icon-bg"><i class="mdi mdi-link-variant menu-icon"></i></span>
+                <span class="menu-title">Programas</span>
+            </a>
+        </li>
         <?php endif; ?>
 
         <!-- FUNDACIÓN - Solo si tiene permiso de fundación -->
@@ -101,12 +107,12 @@ function tieneRol($rol) {
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#online" aria-expanded="false" aria-controls="online">
-            <span class="icon-bg"><i class="mdi mdi-file-document-box"></i></span>
+            <a class="nav-link" data-toggle="collapse" href="#registros" aria-expanded="false" aria-controls="registros">
+            <span class="icon-bg"><i class="mdi mdi-chart-bar menu-icon"></i></span>
             <span class="menu-title">Registros</span>
             <i class="menu-arrow"></i>
             </a>
-            <div class="collapse" id="online">
+            <div class="collapse" id="registros">
             <ul class="nav flex-column sub-menu">
                 <li class="nav-item"><a class="nav-link" href="información.php">Información</a></li>
                 <li class="nav-item"><a class="nav-link" href="dashboardinfo.php">Dashboard</a></li>
