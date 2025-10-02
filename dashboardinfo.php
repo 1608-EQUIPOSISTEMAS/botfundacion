@@ -10,7 +10,7 @@ if (!$user_role) {
 }
 
 // Definir los cores específicos
-$core1 = '51922495159@c.us';
+$core1 = '51993492927@c.us';
 $core2 = '51963801628@c.us';
 
 // Obtener filtros
@@ -367,6 +367,57 @@ $total_inicio = $funnel_foundation['modality_selection'] + $funnel_foundation['p
 $total_general = array_sum($funnel_foundation);
 $tasa_conversion = $total_inicio > 0 ? round(($funnel_foundation['completados'] / $total_inicio) * 100, 1) : 0;
 $tasa_abandono = $total_inicio > 0 ? round(($funnel_foundation['abandonados'] / $total_inicio) * 100, 1) : 0;
+
+// MÉTRICAS DE PAGO (PAY)
+// Total de registros con método de pago enviado (payment_selection)
+$sql_metodo_pago = "
+    SELECT COUNT(*) as total_metodo_pago
+    FROM bot_history
+    WHERE state_contact = 'foundation_payment_selection'
+    $where_core 
+    $where_fecha
+";
+$stmt = $pdo->prepare($sql_metodo_pago);
+foreach ($params as $key => $value) {
+    $stmt->bindValue($key, $value);
+}
+$stmt->execute();
+$total_metodo_pago = $stmt->fetch(PDO::FETCH_ASSOC)['total_metodo_pago'];
+
+// Total de registros con PAY = 1 (realmente pagaron)
+$sql_pagados = "
+    SELECT COUNT(*) as total_pagados
+    FROM bot_history
+    WHERE pay = 1
+    $where_core 
+    $where_fecha
+";
+$stmt = $pdo->prepare($sql_pagados);
+foreach ($params as $key => $value) {
+    $stmt->bindValue($key, $value);
+}
+$stmt->execute();
+$total_pagados = $stmt->fetch(PDO::FETCH_ASSOC)['total_pagados'];
+
+// Calcular tasa de conversión a pago
+$tasa_conversion_pago = $total_metodo_pago > 0 ? round(($total_pagados / $total_metodo_pago) * 100, 1) : 0;
+
+// Distribución de pagos por día
+$sql_pagos_dia = "
+    SELECT DATE(registration_date) as fecha, COUNT(*) as total
+    FROM bot_history
+    WHERE pay = 1
+    $where_core 
+    $where_fecha
+    GROUP BY DATE(registration_date)
+    ORDER BY fecha ASC
+";
+$stmt = $pdo->prepare($sql_pagos_dia);
+foreach ($params as $key => $value) {
+    $stmt->bindValue($key, $value);
+}
+$stmt->execute();
+$pagos_por_dia = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -999,7 +1050,7 @@ $tasa_abandono = $total_inicio > 0 ? round(($funnel_foundation['abandonados'] / 
                         <div class="summary-item">
                             <div class="summary-number"><?php echo number_format($total_core1); ?></div>
                             <div class="summary-label">Linea 1</div>
-                            <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">+51 922 495 159</div>
+                            <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">+51 993 492 927</div>
                         </div>
                         <div class="summary-item">
                             <div class="summary-number"><?php echo number_format($total_core2); ?></div>
@@ -1043,6 +1094,22 @@ $tasa_abandono = $total_inicio > 0 ? round(($funnel_foundation['abandonados'] / 
 
                         <div class="kpi-card-modern">
                             <div class="kpi-header">
+                                <div class="kpi-icon-minimal" style="background: var(--pastel-yellow); color: #F59E0B;">
+                                    <i class="mdi mdi-cash"></i>
+                                </div>
+                            </div>
+                            <div class="kpi-label-modern">Pagos Realizados</div>
+                            <div class="kpi-value-modern"><?php echo number_format($total_pagados); ?></div>
+                            <div class="kpi-description">
+                                <span class="kpi-badge-minimal" style="background: var(--pastel-yellow); color: #92400E;">
+                                    <i class="mdi mdi-trending-up"></i>
+                                    <?php echo $tasa_conversion_pago; ?>% conversión
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card-modern">
+                            <div class="kpi-header">
                                 <div class="kpi-icon-minimal green">
                                     <i class="mdi mdi-calendar-today"></i>
                                 </div>
@@ -1054,19 +1121,6 @@ $tasa_abandono = $total_inicio > 0 ? round(($funnel_foundation['abandonados'] / 
                                     <i class="mdi mdi-trending-up"></i>
                                     Activo
                                 </span>
-                            </div>
-                        </div>
-
-                        <div class="kpi-card-modern">
-                            <div class="kpi-header">
-                                <div class="kpi-icon-minimal purple">
-                                    <i class="mdi mdi-calendar-week"></i>
-                                </div>
-                            </div>
-                            <div class="kpi-label-modern">Últimos 7 Días</div>
-                            <div class="kpi-value-modern"><?php echo number_format($interacciones_semana); ?></div>
-                            <div class="kpi-description">
-                                Promedio: <?php echo round($interacciones_semana / 7, 1); ?>/día
                             </div>
                         </div>
 
@@ -1124,7 +1178,7 @@ $tasa_abandono = $total_inicio > 0 ? round(($funnel_foundation['abandonados'] / 
                     <!-- Comparativa de Cores -->
                     <div class="chart-container-modern" style="margin-bottom: 24px;">
                         <div class="chart-header-modern">
-                            <div class="chart-title-modern">Comparativa de Cores</div>
+                            <div class="chart-title-modern">Comparativa de Lineas</div>
                             <div class="chart-subtitle">Rendimiento del periodo seleccionado</div>
                         </div>
                         <div class="chart-canvas-tall">
@@ -1147,7 +1201,7 @@ $tasa_abandono = $total_inicio > 0 ? round(($funnel_foundation['abandonados'] / 
                     <!-- Análisis Foundation -->
                     <div class="chart-container-modern" style="margin-top: 24px;">
                         <div class="chart-header-modern">
-                            <div class="chart-title-modern">🎯 Embudo de Conversión - Foundation</div>
+                            <div class="chart-title-modern">Embudo de Conversión</div>
                             <div class="chart-subtitle">Análisis del flujo de interacción completo</div>
                         </div>
                         

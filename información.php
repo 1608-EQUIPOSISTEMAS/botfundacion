@@ -44,7 +44,10 @@ error_log("DEBUG - Rol procesado: {$user_role}, Nombre: {$role_name}, Permisos: 
 
 // Obtener los datos de la tabla bot_history
 try {
-    $sql = "SELECT id, concat, invoke_text, registration_date, core_contact, client_contact FROM bot_history ORDER BY registration_date DESC";
+    $sql = "SELECT id, concat, invoke_text, registration_date, core_contact, client_contact, pay 
+            FROM bot_history 
+            WHERE flow_status='completed' 
+            ORDER BY registration_date DESC";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $bot_history_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -69,74 +72,326 @@ try {
     <link rel="stylesheet" href="assets/css/defecto.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
     <style>
-       /* Estilos para celdas tipo textarea */
-.cell-textarea {
-    display: block;
-    width: 100%;
-    min-height: 60px;
-    max-height: 150px;
-    padding: 8px 12px;
-    background: #f8f9fa;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    font-size: 13px;
-    line-height: 1.5;
-    overflow-y: auto;
-    word-wrap: break-word;
-    white-space: pre-wrap;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #2d3748;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
-}
+        /* Reset de DataTables para diseño minimalista */
+        .dataTables_wrapper {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+        }
 
-.cell-textarea:hover {
-    background: #ffffff;
-    border-color: #06b6d4;
-    transition: all 0.2s ease;
-}
+        /* Header minimalista */
+        .page-header-minimal {
+            margin-bottom: 32px;
+        }
 
-/* Estilos para valores NULL */
-.null-value {
-    color: #9ca3af;
-    font-style: italic;
-    text-align: center;
-    padding: 8px;
-}
+        .page-title-minimal {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            font-family: 'Inter', sans-serif;
+        }
 
-/* Ajustes responsivos DataTable */
-#botHistoryTable td {
-    vertical-align: middle;
-}
+        .page-subtitle-minimal {
+            font-size: 14px;
+            color: #737373;
+            font-weight: 400;
+            font-family: 'Inter', sans-serif;
+        }
 
-#botHistoryTable td.mensaje-col {
-    max-width: 350px;
-    padding: 12px;
-}
+        /* Card contenedor minimalista */
+        .card-minimal {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            border: none;
+        }
 
-#botHistoryTable td.phone-col {
-    min-width: 120px;
-}
+        .card-body-minimal {
+            padding: 0;
+        }
 
-/* Scrollbar personalizado */
-.cell-textarea::-webkit-scrollbar {
-    width: 6px;
-}
+        /* Controles superiores DataTables */
+        .dataTables_wrapper .dataTables_filter,
+        .dataTables_wrapper .dataTables_length {
+            padding: 20px 24px;
+        }
 
-.cell-textarea::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-}
+        .dataTables_wrapper .dataTables_filter {
+            float: right;
+        }
 
-.cell-textarea::-webkit-scrollbar-thumb {
-    background: #cbd5e0;
-    border-radius: 4px;
-}
+        .dataTables_wrapper .dataTables_length {
+            float: left;
+        }
 
-.cell-textarea::-webkit-scrollbar-thumb:hover {
-    background: #06b6d4;
-}
+        .dataTables_wrapper .dataTables_filter input {
+            padding: 8px 16px 8px 36px;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 280px;
+            margin-left: 8px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .dataTables_wrapper .dataTables_filter input:focus {
+            outline: none;
+            border-color: #1a1a1a;
+        }
+
+        .dataTables_wrapper .dataTables_length select {
+            padding: 8px 32px 8px 12px;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            margin: 0 8px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .dataTables_wrapper .dataTables_length label,
+        .dataTables_wrapper .dataTables_filter label {
+            font-size: 14px;
+            color: #737373;
+            font-weight: 400;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Tabla minimalista */
+        .table-minimal {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 !important;
+        }
+
+        .table-minimal thead {
+            background: #fafafa;
+        }
+
+        .table-minimal thead th {
+            padding: 12px 24px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: #737373;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #f0f0f0;
+            border-top: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .table-minimal tbody tr {
+            border-bottom: 1px solid #f5f5f5;
+            transition: background 0.15s ease;
+        }
+
+        .table-minimal tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .table-minimal tbody tr:hover .row-actions-minimal {
+            opacity: 1;
+        }
+
+        .table-minimal tbody td {
+            padding: 16px 24px;
+            font-size: 14px;
+            color: #1a1a1a;
+            vertical-align: middle;
+            border-top: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Estilos de celdas específicas */
+        .id-cell-minimal {
+            font-weight: 500;
+            color: #737373;
+            font-size: 13px;
+        }
+
+        .phone-cell-minimal {
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            color: #1a1a1a;
+        }
+
+        .message-cell-minimal {
+            max-width: 400px;
+            line-height: 1.5;
+            color: #404040;
+            padding: 12px 24px;
+        }
+
+        .date-cell-minimal {
+            color: #737373;
+            font-size: 13px;
+        }
+
+        .contact-cell-minimal {
+            font-size: 13px;
+            color: #1a1a1a;
+        }
+
+        .contact-cell-minimal.empty {
+            color: #a3a3a3;
+            font-style: italic;
+        }
+
+        /* Status badges minimalistas */
+        .status-badge-minimal {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .status-badge-minimal.paid {
+            background: #f0fdf4;
+            color: #15803d;
+        }
+
+        .status-badge-minimal.unpaid {
+            background: #fafafa;
+            color: #737373;
+        }
+
+        .status-badge-minimal::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        /* Acciones contextuales */
+        .row-actions-minimal {
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+
+        .btn-action-minimal {
+            padding: 6px 16px;
+            border: 1px solid #e5e5e5;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            background: white;
+            color: #1a1a1a;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-action-minimal:hover:not(:disabled) {
+            background: #1a1a1a;
+            color: white;
+            border-color: #1a1a1a;
+        }
+
+        .btn-action-minimal:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: #fafafa;
+            color: #a3a3a3;
+        }
+
+        .btn-action-minimal:disabled:hover {
+            background: #fafafa;
+            color: #a3a3a3;
+            border-color: #e5e5e5;
+        }
+
+        /* Footer de tabla */
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_paginate {
+            padding: 16px 24px;
+            font-size: 13px;
+            color: #737373;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 6px 12px;
+            margin: 0 2px;
+            border: 1px solid #e5e5e5;
+            border-radius: 6px;
+            background: white;
+            color: #1a1a1a !important;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: #1a1a1a !important;
+            color: white !important;
+            border-color: #1a1a1a !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: #1a1a1a !important;
+            color: white !important;
+            border-color: #1a1a1a !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* Empty state */
+        .empty-state-minimal {
+            text-align: center;
+            padding: 80px 24px;
+            color: #a3a3a3;
+        }
+
+        .empty-state-icon-minimal {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.4;
+        }
+
+        /* Separador limpio */
+        .separator-line-minimal {
+            border: none;
+            height: 24px;
+            background: transparent;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dataTables_wrapper .dataTables_filter,
+            .dataTables_wrapper .dataTables_length {
+                float: none;
+                text-align: left;
+            }
+
+            .dataTables_wrapper .dataTables_filter input {
+                width: 100%;
+            }
+
+            .table-minimal thead th,
+            .table-minimal tbody td {
+                padding: 12px 16px;
+            }
+
+            .row-actions-minimal {
+                opacity: 1;
+            }
+        }
+
+        /* Sobreescribir estilos antiguos */
+        .card {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+        }
     </style>
 </head>
 <body>
@@ -148,91 +403,86 @@ try {
 
             <div class="main-panel">
                 <div class="content-wrapper">
-                    <div class="card" style="border-radius: 20px; box-shadow: 0 4px 16px rgba(6,182,212,0.08);">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="d-flex align-items-center gap-3">
-                                    <h1 class="mb-0" style="font-size: 1.75rem; font-weight: 600; display: flex; align-items: center; gap: 0.75rem;">
-                                        <i class="mdi mdi-history"></i>
-                                        Historial del Bot
-                                    </h1>
-                                    <!-- <?php if ($user_role): ?>
-                                        <span style="margin-left: 8px;" class="role-badge-modern <?php echo htmlspecialchars($role_class); ?>">
-                                            <i class="mdi mdi-shield-check"></i>
-                                            <?php echo htmlspecialchars($role_name); ?>
-                                        </span>
-                                    <?php else: ?>
-                                        <span style="margin-left: 8px;" class="role-badge-modern">
-                                            <i class="mdi mdi-alert"></i>
-                                            Sin Rol Asignado
-                                        </span>
-                                    <?php endif; ?> -->
-                                </div>
-
-                            </div>
-
-                            <?php if (!empty($user_permissions)): ?>
-                                <p class="text-muted mb-0 mt-2" style="font-size: 0.875rem;">
-                                    Aquí puedes ver el historial de interacciones del bot de WhatsApp.
-                                </p>
-                            <?php endif; ?>
-                        </div>
+                    <div class="page-header-minimal">
+                        <h1 class="page-title-minimal">Historial del Bot</h1>
+                        <p class="page-subtitle-minimal">Interacciones registradas en WhatsApp</p>
                     </div>
 
-                    <hr class="separator-line">
+                    <hr class="separator-line-minimal">
 
                     <div class="row">
                         <div class="col-lg-12 grid-margin stretch-card">
-                            <div class="card" style="border-radius: 20px; box-shadow: 0 4px 16px rgba(6,182,212,0.08);">
-                                <div class="card-body">
+                            <div class="card card-minimal">
+                                <div class="card-body card-body-minimal">
                                     <?php if (isset($error_message)): ?>
-                                        <div class="alert alert-danger">
+                                        <div class="alert alert-danger" style="margin: 24px;">
                                             <i class="mdi mdi-alert-circle mr-2"></i>
                                             <?php echo htmlspecialchars($error_message); ?>
                                         </div>
                                     <?php endif; ?>
 
                                     <div class="table-responsive">
-                                        <table id="botHistoryTable" class="table table-bordered table-hover" style="width:100%">
-                                            <thead class="thead-light">
+                                        <table id="botHistoryTable" class="table table-minimal" style="width:100%">
+                                            <thead>
                                                 <tr>
-                                                    <th><i class="mdi mdi-pound mr-1"></i> ID</th>
-                                                    <th><i class="mdi mdi-phone-outgoing mr-1"></i> Teléfono</th>
-                                                    <th><i class="mdi mdi-message-text mr-1"></i> Mensaje Recibido</th>
-                                                    <th><i class="mdi mdi-calendar-clock mr-1"></i> Fecha</th>
-                                                    <th><i class="mdi mdi-account-circle mr-1"></i> Core</th>
-                                                    <th><i class="mdi mdi-account-circle-outline mr-1"></i> Cliente</th>
+                                                    <th style="width: 140px;">ID</th>
+                                                    <th>Mensaje</th>
+                                                    <th style="width: 140px;">Fecha</th>
+                                                    <th style="width: 120px;">Core</th>
+                                                    <th style="width: 120px;">Cliente</th>
+                                                    <th style="width: 120px;">Estado</th>
+                                                 <th style="width: 120px;">Marcar Paga</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <?php if (!empty($bot_history_data)): ?>
                                                     <?php foreach ($bot_history_data as $row): ?>
-                                                        <tr>
-                                                            <td><?php echo htmlspecialchars($row['id']); ?></td>
-                                                            <td class="phone-col"><?php echo htmlspecialchars($row['concat']); ?></td>
-                                                            <td class="mensaje-col">
-                                                                <div class="cell-textarea">
-                                                                    <?php echo htmlspecialchars($row['invoke_text']); ?>
-                                                                </div>
-                                                            </td>
-                                                            <td><?php echo htmlspecialchars($row['registration_date']); ?></td>
-                                                            <td>
-                                                                <?php
-                                                                    if (!empty($row['core_contact'])) {
-                                                                        echo htmlspecialchars($row['core_contact']);
-                                                                    } else {
-                                                                        echo '<span class="null-value">Sin asignar</span>';
-                                                                    }
+                                                        <tr data-id="<?php echo $row['id']; ?>" data-pay="<?php echo $row['pay']; ?>">
+                                                            <td class="id-cell-minimal"><?php echo htmlspecialchars($row['id']); ?></td>
+                                                            <td class="phone-cell-minimal"><?php echo htmlspecialchars($row['invoke_text']); ?></td>
+                                                            <td class="date-cell-minimal">
+                                                                <?php 
+                                                                    $date = new DateTime($row['registration_date']);
+                                                                    echo $date->format('d M Y'); 
                                                                 ?>
                                                             </td>
-                                                            <td><?php echo htmlspecialchars($row['client_contact']); ?></td>
+                                                            <td class="contact-cell-minimal <?php echo empty($row['core_contact']) ? 'empty' : ''; ?>">
+                                                                <?php echo !empty($row['core_contact']) ? htmlspecialchars($row['core_contact']) : 'Sin asignar'; ?>
+                                                            </td>
+                                                            <td class="contact-cell-minimal">
+                                                                <?php echo htmlspecialchars($row['client_contact']); ?>
+                                                            </td>
+                                                            <td>
+                                                                <span class="status-badge-minimal <?php echo $row['pay'] == 1 ? 'paid' : 'unpaid'; ?> pay-badge-<?php echo $row['id']; ?>">
+                                                                    <?php echo $row['pay'] == 1 ? 'Pagado' : 'Pendiente'; ?>
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                <div class="row-actions-minimal">
+                                                                    <?php if ($row['pay'] == 0): ?>
+                                                                        <button type="button" 
+                                                                                class="btn-action-minimal btn-marcar-pagado" 
+                                                                                data-id="<?php echo $row['id']; ?>">
+                                                                            Marcar pagado
+                                                                        </button>
+                                                                    <?php else: ?>
+                                                                        <button type="button" 
+                                                                                class="btn-action-minimal" 
+                                                                                disabled>
+                                                                            Completado
+                                                                        </button>
+                                                                    <?php endif; ?>
+                                                                </div>
+                                                            </td>
                                                         </tr>
                                                     <?php endforeach; ?>
                                                 <?php else: ?>
                                                     <tr>
-                                                        <td colspan="6" class="text-center text-muted py-4">
-                                                            <i class="mdi mdi-database-remove" style="font-size: 2rem;"></i>
-                                                            <p class="mt-2">No hay registros de bot disponibles</p>
+                                                        <td colspan="8">
+                                                            <div class="empty-state-minimal">
+                                                                <div class="empty-state-icon-minimal">📭</div>
+                                                                <p>No hay registros de bot disponibles</p>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 <?php endif; ?>
@@ -265,58 +515,111 @@ try {
 
     <script>
         $(document).ready(function() {
-            $('#botHistoryTable').DataTable({
+            // Inicializar DataTable con diseño minimalista
+            var table = $('#botHistoryTable').DataTable({
                 "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json",
+                    "search": "Buscar:",
+                    "lengthMenu": "Mostrar _MENU_ registros",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Último",
+                        "next": "→",
+                        "previous": "←"
+                    }
                 },
                 "responsive": true,
                 "pageLength": 10,
-                "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
                 "order": [[3, "desc"]],
                 "columnDefs": [
                     {
                         "targets": 0,
-                        "width": "50px",
-                        "className": "text-center"
+                        "className": "id-cell-minimal"
                     },
                     {
                         "targets": 1,
-                        "width": "120px",
-                        "className": "phone-col"
+                        "className": "phone-cell-minimal"
                     },
                     {
                         "targets": 2,
-                        "width": "35%",
-                        "className": "mensaje-col",
+                        "className": "message-cell-minimal",
                         "orderable": false
                     },
                     {
                         "targets": 3,
-                        "width": "140px",
+                        "className": "date-cell-minimal",
                         "type": "date"
                     },
                     {
-                        "targets": 4,
-                        "width": "120px",
-                        "className": "text-center"
-                    },
-                    {
-                        "targets": 5,
-                        "width": "120px",
-                        "className": "text-center"
+                        "targets": [4, 5],
+                        "className": "contact-cell-minimal"
                     }
                 ],
-                "autoWidth": false,
-                "scrollX": false,
-                "drawCallback": function() {
-                    // Ajustar altura de las celdas después de dibujar
-                    $('.cell-textarea').each(function() {
-                        const content = $(this).text().trim();
-                        if (content.length > 100) {
-                            $(this).css('min-height', '80px');
-                        }
-                    });
-                }
+                "autoWidth": false
+            });
+
+            // Manejar clic en botón marcar pagado
+            $('#botHistoryTable').on('click', '.btn-marcar-pagado', function() {
+                const id = $(this).data('id');
+                const $row = $(this).closest('tr');
+                
+                Swal.fire({
+                    title: '¿Marcar como pagado?',
+                    text: "Esta acción actualizará el estado de pago",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, marcar pagado',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#1a1a1a',
+                    cancelButtonColor: '#737373'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: 'acciones/informacion/marcar_pagado.php',
+                            type: 'POST',
+                            data: { id: id },
+                            dataType: 'json',
+                            beforeSend: function() {
+                                Swal.fire({
+                                    title: 'Procesando...',
+                                    allowOutsideClick: false,
+                                    didOpen: () => {
+                                        Swal.showLoading();
+                                    }
+                                });
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: '¡Éxito!',
+                                        text: response.message,
+                                        confirmButtonColor: '#1a1a1a'
+                                    }).then(() => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: response.message,
+                                        confirmButtonColor: '#1a1a1a'
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Error al procesar la solicitud: ' + error,
+                                    confirmButtonColor: '#1a1a1a'
+                                });
+                            }
+                        });
+                    }
+                });
             });
         });
     </script>

@@ -273,7 +273,7 @@ function tieneRol($rol) {
                 <span>Reportes</span>
             </a>
             <div class="nav-dropdown-menu">
-                <a class="nav-dropdown-item" href="información.php">Información</a>
+                <a class="nav-dropdown-item" href="información.php">Pagos</a>
                 <a class="nav-dropdown-item" href="dashboardinfo.php">Dashboard</a>
             </div>
         </li>
