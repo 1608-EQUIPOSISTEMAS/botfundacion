@@ -380,7 +380,7 @@ $tasa_abandono = $total_inicio > 0 ? round(($funnel_foundation['abandonados'] / 
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="shortcut icon" href="assets/images/favicon.png" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    
+    <link rel="stylesheet" href="assets/css/defecto.css">
     <style>
         * {
             margin: 0;
@@ -415,8 +415,8 @@ $tasa_abandono = $total_inicio > 0 ? round(($funnel_foundation['abandonados'] / 
         }
 
         .chart-header-modern {
-    margin-bottom: 40px;  /* Cambia de 28px a 40px o más */
-}
+            margin-bottom: 40px;  /* Cambia de 28px a 40px o más */
+        }
 
         body {
             background: var(--bg-secondary);

@@ -1,215 +1,376 @@
-<nav class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
-    <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
-        <a class="brand-logo d-flex align-items-center" href="index.php" style="padding:0;">
-            <img src="assets/images/we.png" alt="logo" style="height:40px; width:auto;" />
+<style>
+    :root {
+        --header-height: 60px;
+        --header-bg: #ffffff;
+        --text-primary: #1a1a1a;
+        --text-secondary: #666666;
+        --accent-color: #0066ff;
+        --border-color: #e8eaed;
+        --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .header-minimal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: var(--header-height);
+        background: var(--header-bg);
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+        z-index: 1000;
+    }
+
+    /* Logo y Brand */
+    .header-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+    }
+
+    .header-logo {
+        height: 32px;
+        width: auto;
+    }
+
+    .header-brand-text {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-primary);
+        letter-spacing: -0.5px;
+    }
+
+    /* Menu Toggle */
+    .header-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border: none;
+        background: transparent;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: var(--transition);
+        color: var(--text-primary);
+    }
+
+    .header-toggle:hover {
+        background: #f5f7fa;
+    }
+
+    .header-toggle i {
+        font-size: 20px;
+    }
+
+    /* Actions */
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-left: auto;
+    }
+
+    .header-action-btn {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border: none;
+        background: transparent;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: var(--transition);
+        color: var(--text-secondary);
+    }
+
+    .header-action-btn:hover {
+        background: #f5f7fa;
+        color: var(--text-primary);
+    }
+
+    .header-action-btn i {
+        font-size: 18px;
+    }
+
+    /* Badge de notificaciones */
+    .header-badge {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        width: 8px;
+        height: 8px;
+        background: #dc3545;
+        border: 2px solid var(--header-bg);
+        border-radius: 50%;
+    }
+
+    /* Profile Dropdown */
+    .header-profile {
+        position: relative;
+    }
+
+    .header-profile-btn {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 12px 6px 6px;
+        border: none;
+        background: transparent;
+        border-radius: 24px;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .header-profile-btn:hover {
+        background: #f5f7fa;
+    }
+
+    .header-profile-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .header-profile-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary);
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .header-profile-chevron {
+        font-size: 16px;
+        color: var(--text-secondary);
+        transition: var(--transition);
+    }
+
+    .header-profile.active .header-profile-chevron {
+        transform: rotate(180deg);
+    }
+
+    /* Dropdown Menu */
+    .header-dropdown {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        width: 240px;
+        background: var(--header-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: var(--transition);
+        overflow: hidden;
+    }
+
+    .header-profile.active .header-dropdown {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .header-dropdown-header {
+        padding: 16px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .header-dropdown-user {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .header-dropdown-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .header-dropdown-info h6 {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0 0 2px 0;
+    }
+
+    .header-dropdown-info p {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin: 0;
+    }
+
+    .header-dropdown-menu {
+        padding: 8px;
+    }
+
+    .header-dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        color: var(--text-primary);
+        text-decoration: none;
+        border-radius: 8px;
+        transition: var(--transition);
+        font-size: 14px;
+    }
+
+    .header-dropdown-item:hover {
+        background: #f5f7fa;
+    }
+
+    .header-dropdown-item i {
+        font-size: 16px;
+        width: 20px;
+        color: var(--text-secondary);
+    }
+
+    .header-dropdown-divider {
+        height: 1px;
+        background: var(--border-color);
+        margin: 8px 0;
+    }
+
+    .header-dropdown-item.danger {
+        color: #dc3545;
+    }
+
+    .header-dropdown-item.danger:hover {
+        background: #fff5f5;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .header-profile-name {
+            display: none;
+        }
+        
+        .header-profile-btn {
+            padding: 6px;
+        }
+    }
+</style>
+
+<header class="header-minimal">
+    <!-- Left Section -->
+    <div style="display: flex; align-items: center; gap: 16px;">
+        <button class="header-toggle" onclick="toggleSidebar()">
+            <i class="mdi mdi-menu"></i>
+        </button>
+        
+        <a href="index.php" class="header-brand">
+            <img src="assets/images/we.png" alt="W|E" class="header-logo">
+            <span class="header-brand-text">W|E</span>
         </a>
-        <span class="ml-2" style="font-size:1.2rem; color:#ffff;">W|E</span>
-        <a class="navbar-brand brand-logo-mini" href="index.php"><img src="assets/images/we.png" alt="logo" /></a>
     </div>
-    <div class="navbar-menu-wrapper d-flex align-items-stretch">
-        <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
-        <span class="mdi mdi-menu"></span>
-        </button>
-        <div class="search-field d-none d-xl-block">
-        <form class="d-flex align-items-center h-100" action="#">
-            <div class="input-group">
-            <div class="input-group-prepend bg-transparent">
-                <i class="input-group-text border-0 mdi mdi-magnify"></i>
-            </div>
-            <input type="text" class="form-control bg-transparent border-0" placeholder="Search products">
-            </div>
-        </form>
-        </div>
-        <ul class="navbar-nav navbar-nav-right">
-        <li class="nav-item  dropdown d-none d-md-block">
-            <a class="nav-link dropdown-toggle" id="reportDropdown" href="#" data-toggle="dropdown" aria-expanded="false"> Reports </a>
-            <div class="dropdown-menu navbar-dropdown" aria-labelledby="reportDropdown">
-            <a class="dropdown-item" href="#">
-                <i class="mdi mdi-file-pdf mr-2"></i>PDF </a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#">
-                <i class="mdi mdi-file-excel mr-2"></i>Excel </a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#">
-                <i class="mdi mdi-file-word mr-2"></i>doc </a>
-            </div>
-        </li>
-        <li class="nav-item  dropdown d-none d-md-block">
-            <a class="nav-link dropdown-toggle" id="projectDropdown" href="#" data-toggle="dropdown" aria-expanded="false"> Projects </a>
-            <div class="dropdown-menu navbar-dropdown" aria-labelledby="projectDropdown">
-            <a class="dropdown-item" href="#">
-                <i class="mdi mdi-eye-outline mr-2"></i>View Project </a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#">
-                <i class="mdi mdi-pencil-outline mr-2"></i>Edit Project </a>
-            </div>
-        </li>
-        <li class="nav-item nav-language dropdown d-none d-md-block">
-            <a class="nav-link dropdown-toggle" id="languageDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
-            <div class="nav-language-icon">
-                <i class="flag-icon flag-icon-us" title="us" id="us"></i>
-            </div>
-            <div class="nav-language-text">
-                <p class="mb-1 text-black">English</p>
-            </div>
-            </a>
-            <div class="dropdown-menu navbar-dropdown" aria-labelledby="languageDropdown">
-            <a class="dropdown-item" href="#">
-                <div class="nav-language-icon mr-2">
-                <i class="flag-icon flag-icon-ae" title="ae" id="ae"></i>
-                </div>
-                <div class="nav-language-text">
-                <p class="mb-1 text-black">Arabic</p>
-                </div>
-            </a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#">
-                <div class="nav-language-icon mr-2">
-                <i class="flag-icon flag-icon-gb" title="GB" id="gb"></i>
-                </div>
-                <div class="nav-language-text">
-                <p class="mb-1 text-black">English</p>
-                </div>
-            </a>
-            </div>
-        </li>
-        <li class="nav-item nav-profile dropdown">
-            <a class="nav-link dropdown-toggle" id="profileDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
-            <div class="nav-profile-img">
-                <img src="assets/images/faces/face28.png" alt="image">
-            </div>
-            <div class="nav-profile-text">
-                <p class="mb-1 text-black">Henry Klein</p>
-            </div>
-            </a>
-            <div class="dropdown-menu navbar-dropdown dropdown-menu-right p-0 border-0 font-size-sm" aria-labelledby="profileDropdown" data-x-placement="bottom-end">
-            <div class="p-3 text-center bg-primary">
-                <img class="img-avatar img-avatar48 img-avatar-thumb" src="assets/images/faces/face28.png" alt="">
-            </div>
-            <div class="p-2">
-                <h5 class="dropdown-header text-uppercase pl-2 text-dark">User Options</h5>
-                <a class="dropdown-item py-1 d-flex align-items-center justify-content-between" href="#">
-                <span>Inbox</span>
-                <span class="p-0">
-                    <span class="badge badge-primary">3</span>
-                    <i class="mdi mdi-email-open-outline ml-1"></i>
-                </span>
-                </a>
-                <a class="dropdown-item py-1 d-flex align-items-center justify-content-between" href="#">
-                <span>Profile</span>
-                <span class="p-0">
-                    <span class="badge badge-success">1</span>
-                    <i class="mdi mdi-account-outline ml-1"></i>
-                </span>
-                </a>
-                <a class="dropdown-item py-1 d-flex align-items-center justify-content-between" href="javascript:void(0)">
-                <span>Settings</span>
-                <i class="mdi mdi-settings"></i>
-                </a>
-                <div role="separator" class="dropdown-divider"></div>
-                <h5 class="dropdown-header text-uppercase  pl-2 text-dark mt-2">Actions</h5>
-                <a class="dropdown-item py-1 d-flex align-items-center justify-content-between" href="#">
-                <span>Lock Account</span>
-                <i class="mdi mdi-lock ml-1"></i>
-                </a>
-                <a class="dropdown-item py-1 d-flex align-items-center justify-content-between" href="#">
-                <span>Log Out</span>
-                <i class="mdi mdi-logout ml-1"></i>
-                </a>
-            </div>
-            </div>
-        </li>
-        <li class="nav-item dropdown">
-            <a class="nav-link count-indicator dropdown-toggle" id="messageDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
-            <i class="mdi mdi-email-outline"></i>
-            <span class="count-symbol bg-success"></span>
-            </a>
-            <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="messageDropdown">
-            <h6 class="p-3 mb-0 bg-primary text-white py-4">Messages</h6>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                <img src="assets/images/faces/face4.jpg" alt="image" class="profile-pic">
-                </div>
-                <div class="preview-item-content d-flex align-items-start flex-column justify-content-center">
-                <h6 class="preview-subject ellipsis mb-1 font-weight-normal">Mark send you a message</h6>
-                <p class="text-gray mb-0"> 1 Minutes ago </p>
-                </div>
-            </a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                <img src="assets/images/faces/face2.jpg" alt="image" class="profile-pic">
-                </div>
-                <div class="preview-item-content d-flex align-items-start flex-column justify-content-center">
-                <h6 class="preview-subject ellipsis mb-1 font-weight-normal">Cregh send you a message</h6>
-                <p class="text-gray mb-0"> 15 Minutes ago </p>
-                </div>
-            </a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                <img src="assets/images/faces/face3.jpg" alt="image" class="profile-pic">
-                </div>
-                <div class="preview-item-content d-flex align-items-start flex-column justify-content-center">
-                <h6 class="preview-subject ellipsis mb-1 font-weight-normal">Profile picture updated</h6>
-                <p class="text-gray mb-0"> 18 Minutes ago </p>
-                </div>
-            </a>
-            <div class="dropdown-divider"></div>
-            <h6 class="p-3 mb-0 text-center">4 new messages</h6>
-            </div>
-        </li>
-        <li class="nav-item dropdown">
-            <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-toggle="dropdown">
+
+    <!-- Right Section -->
+    <div class="header-actions">
+        <!-- Notificaciones -->
+        <button class="header-action-btn" onclick="showNotifications()">
             <i class="mdi mdi-bell-outline"></i>
-            <span class="count-symbol bg-danger"></span>
-            </a>
-            <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
-            <h6 class="p-3 mb-0 bg-primary text-white py-4">Notifications</h6>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                <div class="preview-icon bg-success">
-                    <i class="mdi mdi-calendar"></i>
-                </div>
-                </div>
-                <div class="preview-item-content d-flex align-items-start flex-column justify-content-center">
-                <h6 class="preview-subject font-weight-normal mb-1">Event today</h6>
-                <p class="text-gray ellipsis mb-0"> Just a reminder that you have an event today </p>
-                </div>
-            </a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                <div class="preview-icon bg-warning">
-                    <i class="mdi mdi-settings"></i>
-                </div>
-                </div>
-                <div class="preview-item-content d-flex align-items-start flex-column justify-content-center">
-                <h6 class="preview-subject font-weight-normal mb-1">Settings</h6>
-                <p class="text-gray ellipsis mb-0"> Update dashboard </p>
-                </div>
-            </a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                <div class="preview-icon bg-info">
-                    <i class="mdi mdi-link-variant"></i>
-                </div>
-                </div>
-                <div class="preview-item-content d-flex align-items-start flex-column justify-content-center">
-                <h6 class="preview-subject font-weight-normal mb-1">Launch Admin</h6>
-                <p class="text-gray ellipsis mb-0"> New admin wow! </p>
-                </div>
-            </a>
-            <div class="dropdown-divider"></div>
-            <h6 class="p-3 mb-0 text-center">See all notifications</h6>
-            </div>
-        </li>
-        </ul>
-        <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
-        <span class="mdi mdi-menu"></span>
+            <span class="header-badge"></span>
         </button>
+
+        <!-- Mensajes -->
+        <button class="header-action-btn" onclick="showMessages()">
+            <i class="mdi mdi-email-outline"></i>
+        </button>
+
+        <!-- Profile Dropdown -->
+        <div class="header-profile" id="profileDropdown">
+            <button class="header-profile-btn" onclick="toggleProfile()">
+                <img src="assets/images/faces/face28.png" alt="User" class="header-profile-avatar">
+                <span class="header-profile-name">Henry Klein</span>
+                <i class="mdi mdi-chevron-down header-profile-chevron"></i>
+            </button>
+
+            <div class="header-dropdown">
+                <div class="header-dropdown-header">
+                    <div class="header-dropdown-user">
+                        <img src="assets/images/faces/face28.png" alt="User" class="header-dropdown-avatar">
+                        <div class="header-dropdown-info">
+                            <h6>Henry Klein</h6>
+                            <p>henry@example.com</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="header-dropdown-menu">
+                    <a href="profile.php" class="header-dropdown-item">
+                        <i class="mdi mdi-account-outline"></i>
+                        <span>Mi Perfil</span>
+                    </a>
+                    
+                    <a href="settings.php" class="header-dropdown-item">
+                        <i class="mdi mdi-wrench-outline"></i>
+                        <span>Configuración</span>
+                    </a>
+
+                    <div class="header-dropdown-divider"></div>
+
+                    <a href="#" onclick="confirmarLogout(); return false;" class="header-dropdown-item danger">
+                        <i class="mdi mdi-logout"></i>
+                        <span>Cerrar Sesión</span>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-</nav>
+</header>
+
+<script>
+// Toggle Profile Dropdown
+function toggleProfile() {
+    const dropdown = document.getElementById('profileDropdown');
+    dropdown.classList.toggle('active');
+    
+    // Cerrar al hacer click fuera
+    if (dropdown.classList.contains('active')) {
+        setTimeout(() => {
+            document.addEventListener('click', closeProfileOnClickOutside);
+        }, 0);
+    }
+}
+
+function closeProfileOnClickOutside(e) {
+    const dropdown = document.getElementById('profileDropdown');
+    if (!dropdown.contains(e.target)) {
+        dropdown.classList.remove('active');
+        document.removeEventListener('click', closeProfileOnClickOutside);
+    }
+}
+
+// Toggle Sidebar (debe estar conectado con tu sidebar)
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) {
+        sidebar.classList.toggle('collapsed');
+    }
+}
+
+// Placeholders para funcionalidad futura
+function showNotifications() {
+    console.log('Mostrar notificaciones');
+    // Aquí irá tu lógica de notificaciones
+}
+
+function showMessages() {
+    console.log('Mostrar mensajes');
+    // Aquí irá tu lógica de mensajes
+}
+</script>

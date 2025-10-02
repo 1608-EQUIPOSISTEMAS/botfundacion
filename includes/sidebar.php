@@ -6,20 +6,13 @@ function tienePermiso($permiso) {
     
     $permisos = $_SESSION['permisos_asignados'];
     
-    // Si tiene permiso "all", tiene acceso a todo
     if (in_array('all', $permisos)) {
         return true;
     }
     
-    // Verificar si tiene el permiso específico
     return in_array($permiso, $permisos);
 }
 
-/**
- * Verifica si el usuario tiene al menos uno de los permisos dados
- * @param array $permisos - Array de permisos a verificar
- * @return bool
- */
 function tieneAlgunPermiso($permisos) {
     foreach ($permisos as $permiso) {
         if (tienePermiso($permiso)) {
@@ -29,11 +22,6 @@ function tieneAlgunPermiso($permisos) {
     return false;
 }
 
-/**
- * Verifica si el usuario tiene todos los permisos dados
- * @param array $permisos - Array de permisos a verificar
- * @return bool
- */
 function tieneTodosPermisos($permisos) {
     foreach ($permisos as $permiso) {
         if (!tienePermiso($permiso)) {
@@ -43,301 +31,440 @@ function tieneTodosPermisos($permisos) {
     return true;
 }
 
-/**
- * Verifica si el usuario tiene un rol específico
- * @param string $rol - Nombre del rol
- * @return bool
- */
 function tieneRol($rol) {
     return isset($_SESSION['rol_nombre']) && $_SESSION['rol_nombre'] === $rol;
 }
 ?>
 
-<!-- ============================================ -->
-<!-- SIDEBAR CON CONTROL DE PERMISOS -->
-<!-- ============================================ -->
-<nav class="sidebar sidebar-offcanvas" id="sidebar">
-    <ul class="nav">
-        <li class="nav-item nav-category">Información</li>
+<!-- ESTILOS MINIMALISTAS -->
+<style>
+    :root {
+        --sidebar-bg: #ffffff;
+        --sidebar-width: 260px;
+        --text-primary: #1a1a1a;
+        --text-secondary: #666666;
+        --accent-color: #0066ff;
+        --hover-bg: #f5f7fa;
+        --border-color: #e8eaed;
+        --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sidebar-minimal {
+        position: fixed;
+        left: 0;
+        top: 60px;
+        width: var(--sidebar-width);
+        height: calc(100vh - 60px);
+        background: var(--sidebar-bg);
+        border-right: 1px solid var(--border-color);
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 0;
+        z-index: 100;
+    }
+
+    .sidebar-minimal::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .sidebar-minimal::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 4px;
+    }
+
+    .sidebar-minimal .nav {
+        padding: 16px 0;
+    }
+
+    .sidebar-minimal .nav-section {
+        padding: 24px 20px 8px 20px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary);
+    }
+
+    .sidebar-minimal .nav-item {
+        margin: 2px 12px;
+    }
+
+    .sidebar-minimal .nav-link {
+        display: flex;
+        align-items: center;
+        padding: 10px 12px;
+        color: var(--text-primary);
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: var(--transition);
+        text-decoration: none;
+        position: relative;
+    }
+
+    .sidebar-minimal .nav-link:hover {
+        background: var(--hover-bg);
+        color: var(--accent-color);
+    }
+
+    .sidebar-minimal .nav-link.active {
+        background: var(--hover-bg);
+        color: var(--accent-color);
+    }
+
+    .sidebar-minimal .nav-link i {
+        font-size: 18px;
+        width: 20px;
+        margin-right: 12px;
+        opacity: 0.8;
+    }
+
+    .sidebar-minimal .nav-link:hover i {
+        opacity: 1;
+    }
+
+    /* Dropdowns minimalistas */
+    .sidebar-minimal .nav-dropdown {
+        margin: 2px 12px;
+    }
+
+    .sidebar-minimal .nav-dropdown > .nav-link {
+        padding: 10px 12px;
+    }
+
+    .sidebar-minimal .nav-dropdown > .nav-link::after {
+        content: '';
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%) rotate(0deg);
+        width: 6px;
+        height: 6px;
+        border-right: 1.5px solid currentColor;
+        border-bottom: 1.5px solid currentColor;
+        transition: var(--transition);
+    }
+
+    .sidebar-minimal .nav-dropdown.active > .nav-link::after {
+        transform: translateY(-50%) rotate(45deg);
+    }
+
+    .sidebar-minimal .nav-dropdown-menu {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+        padding: 0;
+    }
+
+    .sidebar-minimal .nav-dropdown.active .nav-dropdown-menu {
+        max-height: 500px;
+        padding: 4px 0;
+    }
+
+    .sidebar-minimal .nav-dropdown-item {
+        padding: 8px 12px 8px 44px;
+        color: var(--text-secondary);
+        font-size: 13px;
+        display: block;
+        border-radius: 6px;
+        transition: var(--transition);
+        text-decoration: none;
+    }
+
+    .sidebar-minimal .nav-dropdown-item:hover {
+        color: var(--accent-color);
+        background: var(--hover-bg);
+    }
+
+    /* Logout especial */
+    .sidebar-minimal .nav-logout {
+        margin: 24px 12px 12px 12px;
+        border-top: 1px solid var(--border-color);
+        padding-top: 16px;
+    }
+
+    .sidebar-minimal .nav-logout .nav-link {
+        color: #dc3545;
+        font-weight: 600;
+    }
+
+    .sidebar-minimal .nav-logout .nav-link:hover {
+        background: #fff5f5;
+    }
+
+    /* Badge para contadores */
+    .nav-badge {
+        margin-left: auto;
+        background: var(--accent-color);
+        color: white;
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 6px;
+        border-radius: 10px;
+        min-width: 18px;
+        text-align: center;
+    }
+
+    .me-3 {
+        margin-right: 1rem; 
+    }
+</style>
+
+<!-- SIDEBAR MINIMALISTA -->
+<nav class="sidebar-minimal" id="sidebar">
+    <ul class="nav flex-column">
         
-        <!-- INICIO/DASHBOARD - Todos pueden ver -->
+        <!-- SECCIÓN PRINCIPAL -->
+        <li class="nav-section">Principal</li>
+        
         <?php if(tienePermiso('dashboard') || tienePermiso('all')): ?>
         <li class="nav-item">
-            <a class="nav-link" href="dashboard.php">
-                <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
-                <span class="menu-title">Inicio</span>
+            <a class="nav-link active" href="dashboard.php">
+                <i class="mdi mdi-view-dashboard"></i>
+                <span>Inicio</span>
             </a>
         </li>
         <?php endif; ?>
 
-        <!-- CONECTAR BOT -->
         <?php if(tienePermiso('members') || tienePermiso('all')): ?>
         <li class="nav-item">
             <a class="nav-link" href="bot.php">
-                <span class="icon-bg"><i class="mdi mdi-link-variant menu-icon"></i></span>
-                <span class="menu-title">Conectar</span>
+                <i class="mdi mdi-robot"></i>
+                <span>Bot Principal</span>
             </a>
         </li>
+        
         <li class="nav-item">
             <a class="nav-link" href="programas.php">
-                <span class="icon-bg"><i class="mdi mdi-link-variant menu-icon"></i></span>
-                <span class="menu-title">Programas</span>
+                <i class="mdi mdi-book-open-page-variant"></i>
+                <span>Programas</span>
             </a>
         </li>
         <?php endif; ?>
 
-        <!-- FUNDACIÓN - Solo si tiene permiso de fundación -->
-        <?php if(tienePermiso('fundacion')): ?>
+        <!-- SECCIÓN FUNDACIÓN -->
+        <?php if(tienePermiso('fundacion') || tienePermiso('all')): ?>
+        <li class="nav-section">Fundación</li>
+        
         <li class="nav-item">
             <a class="nav-link" href="bot2.php">
-                <span class="icon-bg"><i class="mdi mdi-link-variant menu-icon"></i></span>
-                <span class="menu-title">Primera Linea</span>
+                <i class="mdi mdi-circle-outline"></i>
+                <span>Primera Línea</span>
             </a>
         </li>
-                <li class="nav-item">
+        
+        <li class="nav-item">
             <a class="nav-link" href="bot3.php">
-                <span class="icon-bg"><i class="mdi mdi-link-variant menu-icon"></i></span>
-                <span class="menu-title">Segunda Linea</span>
+                <i class="mdi mdi-circle-outline"></i>
+                <span>Segunda Línea</span>
             </a>
         </li>
+        
         <li class="nav-item">
             <a class="nav-link" href="fundacion.php">
-                <span class="icon-bg"><i class="mdi mdi-heart menu-icon"></i></span>
-                <span class="menu-title">Fundación</span>
+                <i class="mdi mdi-heart-outline"></i>
+                <span>Fundación</span>
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#registros" aria-expanded="false" aria-controls="registros">
-            <span class="icon-bg"><i class="mdi mdi-chart-bar menu-icon"></i></span>
-            <span class="menu-title">Registros</span>
-            <i class="menu-arrow"></i>
+
+        <li class="nav-dropdown">
+            <a class="nav-link" href="#" onclick="toggleDropdown(this); return false;">
+                <i class="mdi mdi-file-chart"></i>
+                <span>Reportes</span>
             </a>
-            <div class="collapse" id="registros">
-            <ul class="nav flex-column sub-menu">
-                <li class="nav-item"><a class="nav-link" href="información.php">Información</a></li>
-                <li class="nav-item"><a class="nav-link" href="dashboardinfo.php">Dashboard</a></li>
-            </ul>
+            <div class="nav-dropdown-menu">
+                <a class="nav-dropdown-item" href="información.php">Información</a>
+                <a class="nav-dropdown-item" href="dashboardinfo.php">Dashboard</a>
             </div>
         </li>
         <?php endif; ?>
 
-        <!-- MEMBERS - Dropdown -->
+        <!-- SECCIÓN MEMBERS -->
         <?php if(tienePermiso('members') || tienePermiso('all')): ?>
-        <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
-                <span class="icon-bg"><i class="mdi mdi-lock menu-icon"></i></span>
-                <span class="menu-title">Members</span>
-                <i class="menu-arrow"></i>
+        <li class="nav-section">Members</li>
+        
+        <li class="nav-dropdown">
+            <a class="nav-link" href="#" onclick="toggleDropdown(this); return false;">
+                <i class="mdi mdi-account-group"></i>
+                <span>Membresías</span>
             </a>
-            <div class="collapse" id="auth">
-                <ul class="nav flex-column sub-menu">
-                    <?php if(tienePermiso('members') || tienePermiso('all')): ?>
-                    <li class="nav-item"><a class="nav-link" href="black.php">Black</a></li>
-                    <li class="nav-item"><a class="nav-link" href="gold.php">Gold</a></li>
-                    <li class="nav-item"><a class="nav-link" href="platinum.php">Platinum</a></li>
-                    <li class="nav-item"><a class="nav-link" href="plus.php">Plus</a></li>
-                    <?php endif; ?>
-                </ul>
+            <div class="nav-dropdown-menu">
+                <a class="nav-dropdown-item" href="black.php">Black</a>
+                <a class="nav-dropdown-item" href="gold.php">Gold</a>
+                <a class="nav-dropdown-item" href="platinum.php">Platinum</a>
+                <a class="nav-dropdown-item" href="plus.php">Plus</a>
             </div>
         </li>
         <?php endif; ?>
 
-        <!-- ONLINE - Solo si tiene permiso online -->
+        <!-- SECCIÓN ONLINE -->
         <?php if(tienePermiso('online') || tienePermiso('all')): ?>
-        <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#online" aria-expanded="false" aria-controls="online">
-            <span class="icon-bg"><i class="mdi mdi-wifi menu-icon"></i></span>
-            <span class="menu-title">Online</span>
-            <i class="menu-arrow"></i>
+        <li class="nav-dropdown">
+            <a class="nav-link" href="#" onclick="toggleDropdown(this); return false;">
+                <i class="mdi mdi-access-point"></i>
+                <span>Online</span>
             </a>
-            <div class="collapse" id="online">
-            <ul class="nav flex-column sub-menu">
-                <li class="nav-item"><a class="nav-link" href="asd.php">Black</a></li>
-                <li class="nav-item"><a class="nav-link" href="asd.php">Gold</a></li>
-                <li class="nav-item"><a class="nav-link" href="asdsd.php">Platinum</a></li>
-                <li class="nav-item"><a class="nav-link" href="asdsa.php">Plus</a></li>
-            </ul>
+            <div class="nav-dropdown-menu">
+                <a class="nav-dropdown-item" href="asd.php">Black</a>
+                <a class="nav-dropdown-item" href="asd.php">Gold</a>
+                <a class="nav-dropdown-item" href="asdsd.php">Platinum</a>
+                <a class="nav-dropdown-item" href="asdsa.php">Plus</a>
             </div>
         </li>
         <?php endif; ?>
 
-        <!-- REPORTES - Para admins o usuarios con permiso -->
+        <!-- SECCIÓN ADMINISTRACIÓN -->
         <?php if(tienePermiso('reportes') || tieneRol('admin')): ?>
-        <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#reportes" aria-expanded="false" aria-controls="reportes">
-                <span class="icon-bg"><i class="mdi mdi-chart-bar menu-icon"></i></span>
-                <span class="menu-title">Reportes</span>
-                <i class="menu-arrow"></i>
+        <li class="nav-section">Administración</li>
+        
+        <li class="nav-dropdown">
+            <a class="nav-link" href="#" onclick="toggleDropdown(this); return false;">
+                <i class="mdi mdi-file-chart"></i>
+                <span>Reportes</span>
             </a>
-            <div class="collapse" id="reportes">
-                <ul class="nav flex-column sub-menu">
-                    <li class="nav-item"><a class="nav-link" href="reportes-ventas.php">Ventas</a></li>
-                    <li class="nav-item"><a class="nav-link" href="reportes-usuarios.php">Usuarios</a></li>
-                </ul>
+            <div class="nav-dropdown-menu">
+                <a class="nav-dropdown-item" href="reportes-ventas.php">Ventas</a>
+                <a class="nav-dropdown-item" href="reportes-usuarios.php">Usuarios</a>
             </div>
         </li>
         <?php endif; ?>
 
-        <!-- CONFIGURACIÓN - Solo admins -->
-        <?php if(tieneRol('admin') || tienePermiso('configuracion')): ?>
-        <li class="nav-item">
-            <a class="nav-link" href="configuracion.php">
-                <span class="icon-bg"><i class="mdi mdi-settings menu-icon"></i></span>
-                <span class="menu-title">Configuración</span>
-            </a>
-        </li>
-        <?php endif; ?>
-
-        <!-- GESTIÓN DE USUARIOS - Solo admins -->
         <?php if(tieneRol('admin') || tienePermiso('usuarios')): ?>
         <li class="nav-item">
             <a class="nav-link" href="usuarios.php">
-                <span class="icon-bg"><i class="mdi mdi-account-multiple menu-icon"></i></span>
-                <span class="menu-title">Usuarios</span>
+                <i class="mdi mdi-account-multiple"></i>
+                <span>Usuarios</span>
             </a>
         </li>
         <?php endif; ?>
 
-        <!-- LOGS - Solo admins -->
+        <?php if(tieneRol('admin') || tienePermiso('configuracion')): ?>
+        <li class="nav-item">
+            <a class="nav-link" href="configuracion.php">
+                <i class="mdi mdi-wrench"></i>
+                <span>Configuración</span>
+            </a>
+        </li>
+        <?php endif; ?>
+
         <?php if(tieneRol('admin') || tienePermiso('logs')): ?>
         <li class="nav-item">
             <a class="nav-link" href="logs.php">
-                <span class="icon-bg"><i class="mdi mdi-file-document menu-icon"></i></span>
-                <span class="menu-title">Logs del Sistema</span>
+                <i class="mdi mdi-folder-text-outline"></i>
+                <span>Logs</span>
             </a>
         </li>
         <?php endif; ?>
 
-        <!-- SEPARADOR -->
-        <li class="nav-item nav-category">Cuenta</li>
-
-        <!-- PERFIL - Todos pueden ver su perfil -->
-        <li class="nav-item sidebar-user-actions">
-            <div class="sidebar-user-menu">
-                <a href="perfil.php" class="nav-link">
-                    <i class="mdi mdi-account-circle menu-icon"></i>
-                    <span class="menu-title">Mi Perfil</span>
-                </a>
-            </div>
-        </li>
-
-        <!-- CERRAR SESIÓN - Todos pueden cerrar sesión -->
-        <li class="nav-item sidebar-user-actions">
-            <div class="sidebar-user-menu">
-                <a href="#" onclick="confirmarLogout(); return false;" class="nav-link text-danger">
-                    <i class="mdi mdi-logout menu-icon"></i>
-                    <span class="menu-title">Cerrar Sesión</span>
-                </a>
-            </div>
+        <!-- LOGOUT -->
+        <li class="nav-logout">
+            <a class="nav-link" href="#" onclick="confirmarLogout(); return false;">
+                <i class="mdi mdi-file-search"></i>
+                <span>Cerrar Sesión</span>
+            </a>
         </li>
     </ul>
 </nav>
 
-<!-- ============================================ -->
-<!-- SWEETALERT2 PARA LOGOUT -->
-<!-- ============================================ -->
+<!-- SWEETALERT2 MINIMALISTA -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-
-<style>
-.swal2-popup {
-    border-radius: 20px !important;
-    padding: 30px !important;
-}
-
-.swal2-icon {
-    margin: 20px auto !important;
-}
-
-.logout-icon {
-    font-size: 80px;
-    animation: rotate 2s ease-in-out infinite;
-}
-
-@keyframes rotate {
-    0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(-10deg); }
-    75% { transform: rotate(10deg); }
-}
-</style>
 
 <script>
+// Toggle para dropdowns
+function toggleDropdown(element) {
+    const parent = element.parentElement;
+    const wasActive = parent.classList.contains('active');
+    
+    // Cerrar otros dropdowns
+    document.querySelectorAll('.nav-dropdown.active').forEach(item => {
+        if (item !== parent) {
+            item.classList.remove('active');
+        }
+    });
+    
+    // Toggle del actual
+    parent.classList.toggle('active');
+}
+
+// Logout minimalista
 async function confirmarLogout() {
     const result = await Swal.fire({
-        title: '¿Cerrar Sesión?',
-        html: `
-            <div style="text-align: center; padding: 20px;">
-                <div class="logout-icon">👋</div>
-                <p style="font-size: 1.2rem; color: #555; margin: 20px 0;">
-                    <strong><?php echo isset($_SESSION['nombre_completo']) ? htmlspecialchars($_SESSION['nombre_completo']) : 'Usuario'; ?></strong>
-                </p>
-                <p style="color: #777;">
-                    ¿Estás seguro que deseas cerrar tu sesión?
-                </p>
-            </div>
-        `,
+        title: '¿Cerrar sesión?',
+        text: '<?php echo isset($_SESSION['nombre_completo']) ? htmlspecialchars($_SESSION['nombre_completo']) : 'Usuario'; ?>',
+        icon: 'question',
         showCancelButton: true,
+        confirmButtonText: 'Salir',
+        cancelButtonText: 'Cancelar',
         confirmButtonColor: '#dc3545',
         cancelButtonColor: '#6c757d',
-        confirmButtonText: '✓ Sí, Salir',
-        cancelButtonText: '✗ Cancelar',
         reverseButtons: true,
-        width: '450px',
-        padding: '20px',
-        background: '#fff',
-        backdrop: 'rgba(0, 0, 0, 0.5)',
-        showClass: {
-            popup: 'animate__animated animate__zoomIn animate__faster'
-        },
-        hideClass: {
-            popup: 'animate__animated animate__zoomOut animate__faster'
-        },
         customClass: {
-            popup: 'border-0 shadow-lg',
-            confirmButton: 'btn btn-danger btn-lg mx-2 px-4',
-            cancelButton: 'btn btn-outline-secondary btn-lg mx-2 px-4'
+            popup: 'swal-minimal',
+            confirmButton: 'btn-minimal-confirm', // Agrega una clase para margen
+            cancelButton: 'btn-minimal-cancel me-3'
         },
-        buttonsStyling: false,
-        allowOutsideClick: false,
-        allowEscapeKey: true,
-        focusCancel: true
+        buttonsStyling: false
     });
 
     if (result.isConfirmed) {
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-        });
-
-        await Toast.fire({
-            icon: 'success',
-            title: 'Cerrando sesión...'
-        });
-
-        await Swal.fire({
-            title: '¡Hasta Pronto! 👋',
-            text: 'Gracias por usar nuestro sistema',
-            icon: 'success',
-            timer: 1500,
-            timerProgressBar: true,
-            showConfirmButton: false,
+        const loading = Swal.fire({
+            title: 'Cerrando sesión...',
             allowOutsideClick: false,
-            showClass: {
-                popup: 'animate__animated animate__fadeIn'
-            },
-            hideClass: {
-                popup: 'animate__animated animate__fadeOut'
+            didOpen: () => {
+                Swal.showLoading();
             }
         });
-
-        window.location.href = 'includes/logout.php';
+        
+        setTimeout(() => {
+            window.location.href = 'includes/logout.php';
+        }, 800);
     }
 }
+
+// Marcar link activo
+document.addEventListener('DOMContentLoaded', function() {
+    const currentPage = window.location.pathname.split('/').pop();
+    document.querySelectorAll('.sidebar-minimal .nav-link').forEach(link => {
+        if (link.getAttribute('href') === currentPage) {
+            link.classList.add('active');
+        } else {
+            link.classList.remove('active');
+        }
+    });
+});
 </script>
+
+<style>
+/* SweetAlert Minimalista */
+.swal-minimal {
+    border-radius: 12px !important;
+    padding: 24px !important;
+}
+
+.btn-minimal-confirm,
+.btn-minimal-cancel {
+    padding: 10px 24px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    transition: all 0.2s !important;
+}
+
+.btn-minimal-confirm {
+    background: #dc3545 !important;
+    color: white !important;
+}
+
+.btn-minimal-confirm:hover {
+    background: #c82333 !important;
+}
+
+.btn-minimal-cancel {
+    background: #f5f7fa !important;
+    color: #666 !important;
+}
+
+.btn-minimal-cancel:hover {
+    background: #e8eaed !important;
+}
+</style>

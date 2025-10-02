@@ -2,13 +2,12 @@
 session_start();
 require_once 'conexion/conexion.php';
 
-// Obtener el rol del usuario
+// [Tu código PHP original de permisos y datos permanece igual]
 $user_role = isset($_SESSION['rol_id']) ? (int)$_SESSION['rol_id'] : null;
 $user_permissions = [];
 $role_name = 'Sin Rol';
 $role_class = 'default';
 
-// Mapear rol a permisos y nombres
 switch($user_role) {
     case 1:
         $user_permissions = ['all'];
@@ -36,13 +35,13 @@ switch($user_role) {
         $role_class = 'default';
 }
 
-// Obtener los datos de la tabla programs
 $programs_data = [];
 try {
-    $sql = "SELECT p.program_id, p.program_name, p.active, c.description as categoria, p.certified_hours, pv.sessions as secciones from
+    $sql = "SELECT p.program_id, p.program_name, p.active, c.description as linea, p.certified_hours, pv.sessions as secciones, c2.description as categoria, pv.version_code from
 programs p
 inner join catalog c on p.cat_category = c.catalog_id
-inner join program_versions pv on p.program_id  = pv.program_id and pv.program_version_id = (select MAX(pv2.program_version_id) from program_versions pv2 where pv2.program_id = p.program_id)
+inner join catalog c2 on p.cat_type_program = c2.catalog_id 
+inner join program_versions pv on p.program_id = pv.program_id and pv.program_version_id = (select MAX(pv2.program_version_id) from program_versions pv2 where pv2.program_id = p.program_id)
 where p.active = 1
 ORDER BY p.program_name ASC";
     $stmt = $pdo->prepare($sql);
@@ -53,11 +52,10 @@ ORDER BY p.program_name ASC";
     $programs_data = [];
 }
 
-// Calcular métricas
 $total_programs = count($programs_data);
 $active_programs = count(array_filter($programs_data, fn($p) => $p['active'] === '1'));
 $inactive_programs = $total_programs - $active_programs;
-$total_categories = count(array_unique(array_column($programs_data, 'categoria')));
+$total_lineas = count(array_unique(array_column($programs_data, 'linea')));
 ?>
 
 <!DOCTYPE html>
@@ -65,7 +63,7 @@ $total_categories = count(array_unique(array_column($programs_data, 'categoria')
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Connect Plus - Programas</title>
+    <title>W|E - Programas</title>
     <link rel="stylesheet" href="assets/vendors/mdi/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="assets/vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="assets/vendors/css/vendor.bundle.base.css">
@@ -81,24 +79,32 @@ $total_categories = count(array_unique(array_column($programs_data, 'categoria')
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
             background: #fafafa;
             color: #1a1a1a;
         }
 
+        /* Layout principal corregido */
+        .main-panel {
+            margin-left: 260px;
+            margin-top: 60px;
+            min-height: calc(100vh - 60px);
+            background: #fafafa;
+        }
+
         .content-wrapper {
-            padding: 32px;
-            max-width: 1400px;
+            padding: 40px 32px;
+            max-width: 1600px;
             margin: 0 auto;
         }
 
-        /* Header minimalista */
+        /* Header de página */
         .page-header {
             margin-bottom: 32px;
         }
 
         .page-header h1 {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 600;
             color: #1a1a1a;
             margin-bottom: 8px;
@@ -111,11 +117,11 @@ $total_categories = count(array_unique(array_column($programs_data, 'categoria')
             font-weight: 400;
         }
 
-        /* Cards de métricas minimalistas */
+        /* Grid de métricas - 4 columnas iguales */
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
             margin-bottom: 40px;
         }
 
@@ -123,62 +129,81 @@ $total_categories = count(array_unique(array_column($programs_data, 'categoria')
             background: #fff;
             border: 1px solid #e5e5e5;
             border-radius: 12px;
-            padding: 20px;
+            padding: 24px;
             transition: all 0.2s;
         }
 
         .metric-card:hover {
             border-color: #d4d4d4;
+            transform: translateY(-2px);
+        }
+
+        .metric-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
         }
 
         .metric-icon {
-            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: #f5f5f5;
+        }
+
+        .metric-icon i {
+            font-size: 20px;
             color: #737373;
-            margin-bottom: 12px;
-            line-height: 1;
+        }
+
+        .metric-icon.icon-total {
+            background: #f0f9ff;
+        }
+
+        .metric-icon.icon-total i {
+            color: #0284c7;
         }
 
         .metric-icon.icon-active {
+            background: #f0fdf4;
+        }
+
+        .metric-icon.icon-active i {
             color: #22c55e;
         }
 
         .metric-icon.icon-inactive {
+            background: #fef2f2;
+        }
+
+        .metric-icon.icon-inactive i {
             color: #ef4444;
         }
 
+        .metric-icon.icon-lineas {
+            background: #faf5ff;
+        }
+
+        .metric-icon.icon-lineas i {
+            color: #a855f7;
+        }
+
         .metric-value {
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 600;
             color: #1a1a1a;
-            margin-bottom: 4px;
             line-height: 1;
+            margin-bottom: 4px;
         }
 
         .metric-label {
             font-size: 13px;
             color: #737373;
-            font-weight: 400;
-        font-weight: 400;
-        }
-
-        .metric-indicator {
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 6px;
-        }
-
-        .indicator-active {
-            background: #22c55e;
-        }
-
-        .indicator-inactive {
-            background: #ef4444;
-        }
-
-        .indicator-neutral {
-            background: #737373;
+            font-weight: 500;
         }
 
         /* Barra de acciones */
@@ -186,21 +211,21 @@ $total_categories = count(array_unique(array_column($programs_data, 'categoria')
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
-            gap: 16px;
+            margin-bottom: 32px;
+            gap: 20px;
         }
 
         .search-box {
             position: relative;
             flex: 1;
-            max-width: 400px;
+            max-width: 420px;
         }
 
         .search-box input {
             width: 100%;
             padding: 12px 16px 12px 44px;
             border: 1px solid #e5e5e5;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 15px;
             background: #fff;
             transition: all 0.2s;
@@ -209,40 +234,95 @@ $total_categories = count(array_unique(array_column($programs_data, 'categoria')
         .search-box input:focus {
             outline: none;
             border-color: #1a1a1a;
+            box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.05);
         }
 
-        .search-box::before {
-            content: "🔍";
+        .search-box i {
             position: absolute;
             left: 16px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 16px;
-            opacity: 0.5;
+            font-size: 18px;
+            color: #a3a3a3;
         }
 
         .btn-new {
-            padding: 12px 24px;
+            padding: 12px 28px;
             background: #1a1a1a;
             color: #fff;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 15px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-new:hover {
             background: #000;
             transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
-        /* Grid de programas */
+        .btn-new i {
+            font-size: 18px;
+        }
+
+        /* Filtros */
+        .filters-container {
+            margin-bottom: 32px;
+        }
+
+        .filter-group {
+            margin-bottom: 20px;
+        }
+
+        .filter-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #737373;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-pills {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-pill {
+            padding: 8px 18px;
+            border: 1px solid #e5e5e5;
+            border-radius: 20px;
+            background: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #525252;
+        }
+
+        .filter-pill:hover {
+            border-color: #1a1a1a;
+            background: #fafafa;
+        }
+
+        .filter-pill.active {
+            border-color: #1a1a1a;
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        /* Grid de programas - 3 columnas */
         .programs-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 24px;
         }
 
@@ -253,12 +333,14 @@ $total_categories = count(array_unique(array_column($programs_data, 'categoria')
             padding: 24px;
             transition: all 0.2s;
             position: relative;
-            cursor: pointer;
+            display: flex;
+            flex-direction: column;
         }
 
         .program-card:hover {
             border-color: #1a1a1a;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
         }
 
         .program-card-header {
@@ -269,40 +351,30 @@ $total_categories = count(array_unique(array_column($programs_data, 'categoria')
         }
 
         .program-title {
-            font-size: 17px;
+            font-size: 18px;
             font-weight: 600;
             color: #1a1a1a;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
+            line-height: 1.3;
         }
 
         .program-category {
             font-size: 13px;
             color: #737373;
+            margin-bottom: 4px;
         }
 
-        /* Horas certificadas */
-        .program-hours {
-            display: flex;
-            align-items: center;
-            gap: 6px;
+        .program-line {
             font-size: 13px;
-            color: #737373;
-            margin-top: 12px;
-            padding: 8px 12px;
-            background: #fafafa;
-            border-radius: 6px;
-            width: fit-content;
-        }
-
-        .program-hours i {
-            font-size: 16px;
+            color: #a3a3a3;
         }
 
         .program-status {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             flex-shrink: 0;
+            margin-top: 4px;
         }
 
         .status-active {
@@ -313,8 +385,38 @@ $total_categories = count(array_unique(array_column($programs_data, 'categoria')
             background: #ef4444;
         }
 
-        .program-actions {
+        /* Stats */
+        .program-stats {
             display: flex;
+            gap: 20px;
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid #f5f5f5;
+            font-size: 13px;
+            color: #737373;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-item i {
+            font-size: 16px;
+            color: #a3a3a3;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-right: 2px;
+        }
+
+        /* Acciones */
+        .program-actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 8px;
             opacity: 0;
             transition: opacity 0.2s;
@@ -327,54 +429,8 @@ $total_categories = count(array_unique(array_column($programs_data, 'categoria')
             opacity: 1;
         }
 
-        /* Información del programa */
-        .program-info {
-            display: flex;
-            gap: 12px;
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid #f5f5f5;
-        }
-
-        .info-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex: 1;
-            padding: 8px;
-            background: #fafafa;
-            border-radius: 6px;
-        }
-
-        .info-icon {
-            font-size: 18px;
-            line-height: 1;
-        }
-
-        .info-content {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .info-value {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1a1a1a;
-            line-height: 1;
-        }
-
-        .info-label {
-            font-size: 11px;
-            color: #737373;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
         .btn-action {
-            flex: 1;
-            padding: 8px 16px;
+            padding: 8px 12px;
             border: 1px solid #e5e5e5;
             border-radius: 6px;
             background: #fff;
@@ -382,40 +438,47 @@ $total_categories = count(array_unique(array_column($programs_data, 'categoria')
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
-            color: #1a1a1a;
+            color: #525252;
         }
 
         .btn-action:hover {
             border-color: #1a1a1a;
             background: #fafafa;
+            transform: translateY(-1px);
+        }
+
+        .btn-view:hover {
+            border-color: #0066ff;
+            color: #0066ff;
+            background: #f0f4ff;
+        }
+
+        .btn-edit:hover {
+            border-color: #eab308;
+            color: #eab308;
+            background: #fef9e7;
         }
 
         .btn-delete:hover {
             border-color: #ef4444;
-            color: #ef4444;
+            color: #dc2626;
             background: #fef2f2;
         }
 
-        .btn-edit:hover {
-            border-color: #bde331ff;
-            color: #bde331ff;
-            background: #fef2f2;
-        }
-
-        .btn-view:hover {
-            border-color: #5a6de6ff;
-            color: #5a6de6ff;
-            background: #fef2f2;
-        }
-
-        /* Estado vacío ultra minimalista */
+        /* Estado vacío */
         .empty-state {
             text-align: center;
             padding: 120px 20px;
         }
 
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 24px;
+            opacity: 0.3;
+        }
+
         .empty-state-title {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: 600;
             color: #1a1a1a;
             margin-bottom: 8px;
@@ -428,17 +491,34 @@ $total_categories = count(array_unique(array_column($programs_data, 'categoria')
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
-            .content-wrapper {
-                padding: 20px;
+        @media (max-width: 1400px) {
+            .programs-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .main-panel {
+                margin-left: 0;
             }
 
             .metrics-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
+        }
+
+        @media (max-width: 768px) {
+            .content-wrapper {
+                padding: 24px 16px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
 
             .actions-bar {
                 flex-direction: column;
+                align-items: stretch;
             }
 
             .search-box {
@@ -448,31 +528,10 @@ $total_categories = count(array_unique(array_column($programs_data, 'categoria')
             .programs-grid {
                 grid-template-columns: 1fr;
             }
-        }
 
-        /* Filtro de categorías minimalista */
-        .filter-pills {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-
-        .filter-pill {
-            padding: 8px 16px;
-            border: 1px solid #e5e5e5;
-            border-radius: 20px;
-            background: #fff;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .filter-pill:hover,
-        .filter-pill.active {
-            border-color: #1a1a1a;
-            background: #1a1a1a;
-            color: #fff;
+            .program-actions {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -488,103 +547,138 @@ $total_categories = count(array_unique(array_column($programs_data, 'categoria')
                     <!-- Header -->
                     <div class="page-header">
                         <h1>Portafolio de Producto</h1>
-                        <p>Administra los programas disponibles en el sistema</p>
+                        <p>Administra y organiza todos los programas del sistema</p>
                     </div>
 
                     <?php if (empty($programs_data)): ?>
                         <!-- Estado vacío -->
                         <div class="empty-state">
+                            <div class="empty-state-icon">📚</div>
                             <h2 class="empty-state-title">No hay programas</h2>
                             <p class="empty-state-text">Crea tu primer programa para comenzar</p>
                             <button class="btn-new" onclick="openAddProgramModal()">
+                                <i class="mdi mdi-plus"></i>
                                 Nuevo programa
                             </button>
                         </div>
                     <?php else: ?>
-                        <!-- Cards de métricas -->
+                        <!-- Métricas -->
                         <div class="metrics-grid">
                             <div class="metric-card">
-                                <div class="metric-icon">
-                                    <i class="mdi mdi-folder-outline"></i>
+                                <div class="metric-header">
+                                    <div class="metric-icon icon-total">
+                                        <i class="mdi mdi-folder-outline"></i>
+                                    </div>
                                 </div>
                                 <div class="metric-value" id="metricTotal"><?php echo $total_programs; ?></div>
                                 <div class="metric-label">Total de programas</div>
                             </div>
+                            
                             <div class="metric-card">
-                                <div class="metric-icon icon-active">
-                                    <i class="mdi mdi-check-circle-outline"></i>
+                                <div class="metric-header">
+                                    <div class="metric-icon icon-active">
+                                        <i class="mdi mdi-check-circle-outline"></i>
+                                    </div>
                                 </div>
                                 <div class="metric-value" id="metricActive"><?php echo $active_programs; ?></div>
                                 <div class="metric-label">Programas activos</div>
                             </div>
+                            
                             <div class="metric-card">
-                                <div class="metric-icon icon-inactive">
-                                    <i class="mdi mdi-close-circle-outline"></i>
+                                <div class="metric-header">
+                                    <div class="metric-icon icon-inactive">
+                                        <i class="mdi mdi-close-circle-outline"></i>
+                                    </div>
                                 </div>
                                 <div class="metric-value" id="metricInactive"><?php echo $inactive_programs; ?></div>
                                 <div class="metric-label">Programas inactivos</div>
                             </div>
+                            
                             <div class="metric-card">
-                                <div class="metric-icon">
-                                    <i class="mdi mdi-shape-outline"></i>
+                                <div class="metric-header">
+                                    <div class="metric-icon icon-lineas">
+                                        <i class="mdi mdi-shape-outline"></i>
+                                    </div>
                                 </div>
-                                <div class="metric-value" id="metricCategories"><?php echo $total_categories; ?></div>
-                                <div class="metric-label">Categorías</div>
+                                <div class="metric-value" id="metricLineas"><?php echo $total_lineas; ?></div>
+                                <div class="metric-label">Líneas de negocio</div>
                             </div>
                         </div>
 
                         <!-- Barra de acciones -->
                         <div class="actions-bar">
                             <div class="search-box">
+                                <i class="mdi mdi-magnify"></i>
                                 <input type="text" id="searchInput" placeholder="Buscar programas...">
                             </div>
                             <button class="btn-new" onclick="openAddProgramModal()">
+                                <i class="mdi mdi-plus"></i>
                                 Nuevo programa
                             </button>
                         </div>
 
-                        <!-- Filtros de categoría -->
-                        <div class="filter-pills">
-                            <button class="filter-pill active" data-category="all">Todos</button>
-                            <?php 
-                            $categories = array_unique(array_column($programs_data, 'categoria'));
-                            foreach ($categories as $cat): 
-                            ?>
-                                <button class="filter-pill" data-category="<?php echo htmlspecialchars($cat); ?>">
-                                    <?php echo htmlspecialchars($cat); ?>
-                                </button>
-                            <?php endforeach; ?>
+                        <!-- Filtros -->
+                        <div class="filters-container">
+                            <div class="filter-group">
+                                <div class="filter-label">Línea de negocio</div>
+                                <div class="filter-pills" id="lineFilters">
+                                    <button class="filter-pill active" data-type="linea" data-value="all">Todas</button>
+                                    <?php 
+                                    $lineas = array_unique(array_column($programs_data, 'linea'));
+                                    foreach ($lineas as $linea): 
+                                    ?>
+                                        <button class="filter-pill" data-type="linea" data-value="<?php echo htmlspecialchars($linea); ?>">
+                                            <?php echo htmlspecialchars($linea); ?>
+                                        </button>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+
+                            <div class="filter-group">
+                                <div class="filter-label">Categoría</div>
+                                <div class="filter-pills" id="categoryFilters">
+                                    <button class="filter-pill active" data-type="categoria" data-value="all">Todas</button>
+                                    <?php 
+                                    $categorias = array_unique(array_column($programs_data, 'categoria'));
+                                    foreach ($categorias as $cat): 
+                                    ?>
+                                        <button class="filter-pill" data-type="categoria" data-value="<?php echo htmlspecialchars($cat); ?>">
+                                            <?php echo htmlspecialchars($cat); ?>
+                                        </button>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Grid de programas -->
                         <div class="programs-grid" id="programsGrid">
                             <?php foreach ($programs_data as $row): ?>
                                 <div class="program-card" 
-                                    data-category="<?php echo htmlspecialchars($row['categoria']); ?>"
+                                    data-linea="<?php echo htmlspecialchars($row['linea']); ?>"
+                                    data-categoria="<?php echo htmlspecialchars($row['categoria']); ?>"
                                     data-name="<?php echo htmlspecialchars(strtolower($row['program_name'])); ?>">
+                                    
                                     <div class="program-card-header">
-                                        <div>
+                                        <div style="flex: 1;">
                                             <h3 class="program-title"><?php echo htmlspecialchars($row['program_name']); ?></h3>
                                             <p class="program-category"><?php echo htmlspecialchars($row['categoria']); ?></p>
+                                            <p class="program-line"><?php echo htmlspecialchars($row['linea']); ?></p>
                                         </div>
                                         <div class="program-status <?php echo $row['active'] === '1' ? 'status-active' : 'status-inactive'; ?>"></div>
                                     </div>
 
-                                    <!-- Nueva sección de información -->
-                                    <div class="program-info">
-                                        <div class="info-item">
-                                            <span class="info-icon"><i class="mdi mdi-format-list-bulleted"></i></span>
-                                            <div class="info-content">
-                                                <span class="info-value"><?php echo htmlspecialchars($row['secciones'] ?? '0'); ?></span>
-                                                <span class="info-label">Sesiones</span>
-                                            </div>
+                                    <div class="program-stats">
+                                        <div class="stat-item">
+                                            <i class="mdi mdi-format-list-bulleted"></i>
+                                            <span><span class="stat-value"><?php echo htmlspecialchars($row['secciones'] ?? '0'); ?></span> sesiones</span>
                                         </div>
-                                        <div class="info-item">
-                                            <span class="info-icon"><i class="mdi mdi-clock-outline"></i></span>
-                                            <div class="info-content">
-                                                <span class="info-value"><?php echo htmlspecialchars($row['certified_hours'] ?? '0'); ?></span>
-                                                <span class="info-label">Horas</span>
-                                            </div>
+                                        <div class="stat-item">
+                                            <i class="mdi mdi-clock-outline"></i>
+                                            <span><span class="stat-value"><?php echo htmlspecialchars($row['certified_hours'] ?? '0'); ?></span> horas</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <i class="mdi mdi-tag-outline"></i>
+                                            <span class="stat-value"><?php echo htmlspecialchars($row['version_code'] ?? 'V1.0'); ?></span>
                                         </div>
                                     </div>
 
@@ -592,12 +686,14 @@ $total_categories = count(array_unique(array_column($programs_data, 'categoria')
                                         <button class="btn-action btn-view" onclick="viewProgram(<?php echo $row['program_id']; ?>)">
                                             Ver
                                         </button>
+                                        <?php if(tienePermiso('producto') || tienePermiso('all')): ?>
                                         <button class="btn-action btn-edit" onclick="editProgram(<?php echo $row['program_id']; ?>)">
                                             Editar
                                         </button>
                                         <button class="btn-action btn-delete" onclick="deleteProgram(<?php echo $row['program_id']; ?>)">
                                             Eliminar
                                         </button>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
@@ -616,113 +712,76 @@ $total_categories = count(array_unique(array_column($programs_data, 'categoria')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
 
     <script>
-        // Búsqueda en tiempo real
+        let activeFilters = {
+            linea: 'all',
+            categoria: 'all',
+            search: ''
+        };
+
+        // Búsqueda
         const searchInput = document.getElementById('searchInput');
         if (searchInput) {
             searchInput.addEventListener('input', function(e) {
-                const searchTerm = e.target.value.toLowerCase();
-                const cards = document.querySelectorAll('.program-card');
-                
-                cards.forEach(card => {
-                    const name = card.dataset.name;
-                    if (name.includes(searchTerm)) {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-                
-                updateMetrics();
+                activeFilters.search = e.target.value.toLowerCase();
+                applyFilters();
             });
         }
 
-        // Filtro de categorías con actualización de métricas
-        const filterPills = document.querySelectorAll('.filter-pill');
-        filterPills.forEach(pill => {
+        // Filtros de línea
+        const lineFilters = document.querySelectorAll('#lineFilters .filter-pill');
+        lineFilters.forEach(pill => {
             pill.addEventListener('click', function() {
-                filterPills.forEach(p => p.classList.remove('active'));
+                lineFilters.forEach(p => p.classList.remove('active'));
                 this.classList.add('active');
-                
-                const category = this.dataset.category;
-                const cards = document.querySelectorAll('.program-card');
-                
-                cards.forEach(card => {
-                    if (category === 'all' || card.dataset.category === category) {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-                
-                updateMetrics();
+                activeFilters.linea = this.dataset.value;
+                applyFilters();
             });
         });
 
-        // Función para actualizar las métricas dinámicamente
+        // Filtros de categoría
+        const categoryFilters = document.querySelectorAll('#categoryFilters .filter-pill');
+        categoryFilters.forEach(pill => {
+            pill.addEventListener('click', function() {
+                categoryFilters.forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+                activeFilters.categoria = this.dataset.value;
+                applyFilters();
+            });
+        });
+
+        function applyFilters() {
+            const cards = document.querySelectorAll('.program-card');
+            
+            cards.forEach(card => {
+                const matchLinea = activeFilters.linea === 'all' || card.dataset.linea === activeFilters.linea;
+                const matchCategoria = activeFilters.categoria === 'all' || card.dataset.categoria === activeFilters.categoria;
+                const matchSearch = activeFilters.search === '' || card.dataset.name.includes(activeFilters.search);
+                
+                card.style.display = (matchLinea && matchCategoria && matchSearch) ? 'flex' : 'none';
+            });
+            
+            updateMetrics();
+        }
+
         function updateMetrics() {
             const visibleCards = Array.from(document.querySelectorAll('.program-card'))
                 .filter(card => card.style.display !== 'none');
             
             const totalVisible = visibleCards.length;
-            const activeVisible = visibleCards.filter(card => 
-                card.querySelector('.status-active')
-            ).length;
+            const activeVisible = visibleCards.filter(card => card.querySelector('.status-active')).length;
             const inactiveVisible = totalVisible - activeVisible;
+            const uniqueLineas = new Set(visibleCards.map(card => card.dataset.linea));
             
-            // Contar categorías únicas de los programas visibles
-            const uniqueCategories = new Set(
-                visibleCards.map(card => card.dataset.category)
-            );
-            const categoriesCount = uniqueCategories.size;
-            
-            // Actualizar los valores en las métricas con animación
-            animateValue('metricTotal', totalVisible);
-            animateValue('metricActive', activeVisible);
-            animateValue('metricInactive', inactiveVisible);
-            animateValue('metricCategories', categoriesCount);
-        }
-
-        // Función para animar el cambio de valores
-        function animateValue(elementId, newValue) {
-            const element = document.getElementById(elementId);
-            const currentValue = parseInt(element.textContent) || 0;
-            
-            if (currentValue === newValue) return;
-            
-            const duration = 300;
-            const stepTime = 20;
-            const steps = duration / stepTime;
-            const increment = (newValue - currentValue) / steps;
-            let current = currentValue;
-            let step = 0;
-            
-            const timer = setInterval(() => {
-                step++;
-                current += increment;
-                
-                if (step >= steps) {
-                    element.textContent = newValue;
-                    clearInterval(timer);
-                } else {
-                    element.textContent = Math.round(current);
-                }
-            }, stepTime);
+            document.getElementById('metricTotal').textContent = totalVisible;
+            document.getElementById('metricActive').textContent = activeVisible;
+            document.getElementById('metricInactive').textContent = inactiveVisible;
+            document.getElementById('metricLineas').textContent = uniqueLineas.size;
         }
 
         function openAddProgramModal() {
             Swal.fire({
                 title: 'Nuevo programa',
-                html: `
-                    <input id="programName" class="swal2-input" placeholder="Nombre del programa">
-                    <select id="programCategory" class="swal2-input">
-                        <option value="">Selecciona categoría</option>
-                        <?php foreach ($categories as $cat): ?>
-                            <option value="<?php echo htmlspecialchars($cat); ?>">
-                                <?php echo htmlspecialchars($cat); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                `,
+                html: '<input id="programName" class="swal2-input" placeholder="Nombre del programa">',
                 showCancelButton: true,
                 confirmButtonText: 'Crear',
                 cancelButtonText: 'Cancelar',
@@ -732,16 +791,11 @@ $total_categories = count(array_unique(array_column($programs_data, 'categoria')
         }
 
         function viewProgram(id) {
-            console.log('Ver programa:', id);
+            window.location.href = 'program-detail.php?id=' + id;
         }
 
         function editProgram(id) {
-            Swal.fire({
-                title: 'Editar programa',
-                text: 'ID: ' + id,
-                icon: 'info',
-                confirmButtonColor: '#1a1a1a'
-            });
+            window.location.href = 'program-edit.php?id=' + id;
         }
 
         function deleteProgram(id) {
@@ -756,6 +810,7 @@ $total_categories = count(array_unique(array_column($programs_data, 'categoria')
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
+                    // Aquí iría tu lógica AJAX para eliminar
                     Swal.fire({
                         title: 'Eliminado',
                         text: 'El programa ha sido eliminado',
