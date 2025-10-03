@@ -53,14 +53,16 @@ function tieneRol($rol) {
         position: fixed;
         left: 0;
         top: 60px;
-        width: var(--sidebar-width);
+        width: 260px;
         height: calc(100vh - 60px);
-        background: var(--sidebar-bg);
-        border-right: 1px solid var(--border-color);
+        background: #ffffff;
+        border-right: 1px solid #e8eaed;
         overflow-y: auto;
         overflow-x: hidden;
         padding: 0;
         z-index: 100;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateX(0);
     }
 
     .sidebar-minimal::-webkit-scrollbar {

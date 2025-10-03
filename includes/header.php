@@ -358,10 +358,30 @@ function closeProfileOnClickOutside(e) {
 // Toggle Sidebar (debe estar conectado con tu sidebar)
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
-    if (sidebar) {
+    const mainPanel = document.querySelector('.main-panel');
+    
+    if (sidebar && mainPanel) {
         sidebar.classList.toggle('collapsed');
+        mainPanel.classList.toggle('expanded');
+        
+        // Guardar estado en localStorage
+        const isCollapsed = sidebar.classList.contains('collapsed');
+        localStorage.setItem('sidebarCollapsed', isCollapsed);
     }
 }
+
+// Restaurar estado al cargar
+document.addEventListener('DOMContentLoaded', function() {
+    const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+    if (isCollapsed) {
+        const sidebar = document.getElementById('sidebar');
+        const mainPanel = document.querySelector('.main-panel');
+        if (sidebar && mainPanel) {
+            sidebar.classList.add('collapsed');
+            mainPanel.classList.add('expanded');
+        }
+    }
+});
 
 // Placeholders para funcionalidad futura
 function showNotifications() {

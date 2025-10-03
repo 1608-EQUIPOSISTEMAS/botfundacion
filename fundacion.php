@@ -480,6 +480,34 @@ try {
             font-size: 24px;
         }
 
+        .main-panel {
+            margin-left: 260px;
+            margin-top: 60px;
+            min-height: calc(100vh - 60px);
+            background: #fafafa;
+        }
+
+        .content-wrapper {
+            padding: 40px 32px;
+            max-width: none; /* Sin límite cuando está expandido */
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .sidebar-minimal.collapsed {
+            transform: translateX(-260px);
+        }
+
+        .main-panel.expanded {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        /* Smooth transitions */
+        .sidebar-minimal {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         /* Responsive */
         @media (max-width: 1024px) {
             .main-panel {
@@ -528,10 +556,7 @@ try {
                     <!-- Header -->
                     <div class="page-header">
                         <div class="header-content">
-                            <h1>Bot Foundation</h1>
-                            <div class="breadcrumb">
-                                <a href="dashboard.php">Dashboard</a> / <a href="#">Bot</a> / Foundation
-                            </div>
+                            <h1>Bot Fundación</h1>
                         </div>
                         <?php if ($bot): ?>
                         <button class="btn-edit-main" data-toggle="modal" data-target="#editarBotModal" data-id="<?php echo $bot['id']; ?>">
@@ -765,7 +790,7 @@ try {
                         <!-- Texto Final -->
                         <div class="config-section">
                             <div class="section-title">
-                                <i class="mdi mdi-text-box"></i>
+                                <i class="mdi mdi-text"></i>
                                 Mensaje Final
                             </div>
                             <div class="message-box">

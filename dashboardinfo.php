@@ -439,6 +439,34 @@ $pagos_por_dia = $stmt->fetchAll(PDO::FETCH_ASSOC);
             box-sizing: border-box;
         }
 
+        .main-panel {
+            margin-left: 260px;
+            margin-top: 60px;
+            min-height: calc(100vh - 60px);
+            background: #fafafa;
+        }
+
+        .content-wrapper {
+            padding: 40px 32px;
+            max-width: none; /* Sin límite cuando está expandido */
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .sidebar-minimal.collapsed {
+            transform: translateX(-260px);
+        }
+
+        .main-panel.expanded {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        /* Smooth transitions */
+        .sidebar-minimal {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         :root {
             --bg-primary: #FFFFFF;
             --bg-secondary: #F8FAFC;

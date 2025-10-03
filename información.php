@@ -75,6 +75,35 @@ try {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
     <style>
+        .main-panel {
+            margin-left: 260px;
+            margin-top: 60px;
+            min-height: calc(100vh - 60px);
+            background: #fafafa;
+        }
+
+        .content-wrapper {
+            padding: 40px 32px;
+            max-width: none; /* Sin límite cuando está expandido */
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .sidebar-minimal.collapsed {
+            transform: translateX(-260px);
+        }
+
+        .main-panel.expanded {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        /* Smooth transitions */
+        .sidebar-minimal {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+
         /* Reset de DataTables para diseño minimalista */
         .dataTables_wrapper {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
@@ -318,34 +347,6 @@ try {
             font-family: 'Inter', sans-serif;
         }
 
-        .dataTables_wrapper .dataTables_paginate .paginate_button {
-            padding: 6px 12px;
-            margin: 0 2px;
-            border: 1px solid #e5e5e5;
-            border-radius: 6px;
-            background: white;
-            color: #1a1a1a !important;
-            font-size: 13px;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-            background: #1a1a1a !important;
-            color: white !important;
-            border-color: #1a1a1a !important;
-        }
-
-        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-            background: #1a1a1a !important;
-            color: white !important;
-            border-color: #1a1a1a !important;
-        }
-
-        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-
         /* Empty state */
         .empty-state-minimal {
             text-align: center;
@@ -403,7 +404,7 @@ try {
 
             <div class="main-panel">
                 <div class="content-wrapper">
-                    <div class="page-header-minimal">
+                    <div class="page-header-minimal" style="margin-bottom: -32px;">
                         <h1 class="page-title-minimal">Historial del Bot</h1>
                         <p class="page-subtitle-minimal">Interacciones registradas en WhatsApp</p>
                     </div>

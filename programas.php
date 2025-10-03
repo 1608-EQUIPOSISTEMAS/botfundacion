@@ -94,8 +94,9 @@ $total_lineas = count(array_unique(array_column($programs_data, 'linea')));
 
         .content-wrapper {
             padding: 40px 32px;
-            max-width: 1600px;
+            max-width: none; /* Sin límite cuando está expandido */
             margin: 0 auto;
+            width: 100%;
         }
 
         /* Header de página */
@@ -490,6 +491,91 @@ $total_lineas = count(array_unique(array_column($programs_data, 'linea')));
             margin-bottom: 32px;
         }
 
+        /* Paginación minimalista */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        .pagination-info {
+            font-size: 14px;
+            color: #737373;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .page-btn {
+            padding: 8px 12px;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            background: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #525252;
+            min-width: 40px;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            border-color: #1a1a1a;
+            background: #fafafa;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .page-btn.active {
+            border-color: #1a1a1a;
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        .page-dots {
+            color: #a3a3a3;
+            padding: 0 8px;
+        }
+
+        /* Sidebar collapse */
+        .sidebar-minimal.collapsed {
+            transform: translateX(-260px);
+        }
+
+        .main-panel {
+            margin-left: 260px;
+            margin-top: 60px;
+            min-height: calc(100vh - 60px);
+            background: #fafafa;
+            width: calc(100% - 260px);
+        }
+
+        .main-panel.expanded {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        /* Smooth transitions */
+        .sidebar-minimal {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @media (max-width: 768px) {
+            .pagination-container {
+                flex-direction: column;
+                gap: 16px;
+            }
+        }
+
         /* Responsive */
         @media (max-width: 1400px) {
             .programs-grid {
@@ -532,6 +618,7 @@ $total_lineas = count(array_unique(array_column($programs_data, 'linea')));
             .program-actions {
                 grid-template-columns: 1fr;
             }
+
         }
     </style>
 </head>
@@ -698,6 +785,12 @@ $total_lineas = count(array_unique(array_column($programs_data, 'linea')));
                                 </div>
                             <?php endforeach; ?>
                         </div>
+
+                        <!-- Paginación -->
+                        <div class="pagination-container" id="paginationContainer" style="display: none;">
+                            <div class="pagination-info" id="paginationInfo"></div>
+                            <div class="pagination-controls" id="paginationControls"></div>
+                        </div>
                     <?php endif; ?>
                 </div>
                 <?php include 'includes/footer.php'; ?>
@@ -711,115 +804,224 @@ $total_lineas = count(array_unique(array_column($programs_data, 'linea')));
     <script src="assets/js/misc.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
 
-    <script>
-        let activeFilters = {
-            linea: 'all',
-            categoria: 'all',
-            search: ''
-        };
+<script>
+    let activeFilters = {
+        linea: 'all',
+        categoria: 'all',
+        search: ''
+    };
+    
+    let currentPage = 1;
+    const itemsPerPage = 9;
 
-        // Búsqueda
-        const searchInput = document.getElementById('searchInput');
-        if (searchInput) {
-            searchInput.addEventListener('input', function(e) {
-                activeFilters.search = e.target.value.toLowerCase();
-                applyFilters();
-            });
-        }
-
-        // Filtros de línea
-        const lineFilters = document.querySelectorAll('#lineFilters .filter-pill');
-        lineFilters.forEach(pill => {
-            pill.addEventListener('click', function() {
-                lineFilters.forEach(p => p.classList.remove('active'));
-                this.classList.add('active');
-                activeFilters.linea = this.dataset.value;
-                applyFilters();
-            });
+    // Búsqueda
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+            activeFilters.search = e.target.value.toLowerCase();
+            currentPage = 1;
+            applyFilters();
         });
+    }
 
-        // Filtros de categoría
-        const categoryFilters = document.querySelectorAll('#categoryFilters .filter-pill');
-        categoryFilters.forEach(pill => {
-            pill.addEventListener('click', function() {
-                categoryFilters.forEach(p => p.classList.remove('active'));
-                this.classList.add('active');
-                activeFilters.categoria = this.dataset.value;
-                applyFilters();
-            });
+    // Filtros de línea
+    const lineFilters = document.querySelectorAll('#lineFilters .filter-pill');
+    lineFilters.forEach(pill => {
+        pill.addEventListener('click', function() {
+            lineFilters.forEach(p => p.classList.remove('active'));
+            this.classList.add('active');
+            activeFilters.linea = this.dataset.value;
+            currentPage = 1;
+            applyFilters();
         });
+    });
 
-        function applyFilters() {
-            const cards = document.querySelectorAll('.program-card');
+    // Filtros de categoría
+    const categoryFilters = document.querySelectorAll('#categoryFilters .filter-pill');
+    categoryFilters.forEach(pill => {
+        pill.addEventListener('click', function() {
+            categoryFilters.forEach(p => p.classList.remove('active'));
+            this.classList.add('active');
+            activeFilters.categoria = this.dataset.value;
+            currentPage = 1;
+            applyFilters();
+        });
+    });
+
+    function applyFilters() {
+        const cards = document.querySelectorAll('.program-card');
+        let visibleCards = [];
+        
+        cards.forEach(card => {
+            const matchLinea = activeFilters.linea === 'all' || card.dataset.linea === activeFilters.linea;
+            const matchCategoria = activeFilters.categoria === 'all' || card.dataset.categoria === activeFilters.categoria;
+            const matchSearch = activeFilters.search === '' || card.dataset.name.includes(activeFilters.search);
             
-            cards.forEach(card => {
-                const matchLinea = activeFilters.linea === 'all' || card.dataset.linea === activeFilters.linea;
-                const matchCategoria = activeFilters.categoria === 'all' || card.dataset.categoria === activeFilters.categoria;
-                const matchSearch = activeFilters.search === '' || card.dataset.name.includes(activeFilters.search);
-                
-                card.style.display = (matchLinea && matchCategoria && matchSearch) ? 'flex' : 'none';
-            });
-            
-            updateMetrics();
-        }
+            if (matchLinea && matchCategoria && matchSearch) {
+                visibleCards.push(card);
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        
+        paginateCards(visibleCards);
+        updateMetrics(visibleCards);
+    }
 
-        function updateMetrics() {
-            const visibleCards = Array.from(document.querySelectorAll('.program-card'))
-                .filter(card => card.style.display !== 'none');
-            
-            const totalVisible = visibleCards.length;
-            const activeVisible = visibleCards.filter(card => card.querySelector('.status-active')).length;
-            const inactiveVisible = totalVisible - activeVisible;
-            const uniqueLineas = new Set(visibleCards.map(card => card.dataset.linea));
-            
-            document.getElementById('metricTotal').textContent = totalVisible;
-            document.getElementById('metricActive').textContent = activeVisible;
-            document.getElementById('metricInactive').textContent = inactiveVisible;
-            document.getElementById('metricLineas').textContent = uniqueLineas.size;
-        }
+    function paginateCards(cards) {
+        const totalPages = Math.ceil(cards.length / itemsPerPage);
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        
+        // Ocultar todas primero
+        cards.forEach(card => card.style.display = 'none');
+        
+        // Mostrar solo las de la página actual
+        cards.slice(startIndex, endIndex).forEach(card => {
+            card.style.display = 'flex';
+        });
+        
+        renderPagination(cards.length, totalPages);
+    }
 
-        function openAddProgramModal() {
-            Swal.fire({
-                title: 'Nuevo programa',
-                html: '<input id="programName" class="swal2-input" placeholder="Nombre del programa">',
-                showCancelButton: true,
-                confirmButtonText: 'Crear',
-                cancelButtonText: 'Cancelar',
-                confirmButtonColor: '#1a1a1a',
-                cancelButtonColor: '#737373'
-            });
+    function renderPagination(totalItems, totalPages) {
+        const container = document.getElementById('paginationContainer');
+        const info = document.getElementById('paginationInfo');
+        const controls = document.getElementById('paginationControls');
+        
+        if (totalPages <= 1) {
+            container.style.display = 'none';
+            return;
         }
+        
+        container.style.display = 'flex';
+        
+        // Info
+        const startItem = ((currentPage - 1) * itemsPerPage) + 1;
+        const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+        info.textContent = `Mostrando ${startItem}-${endItem} de ${totalItems} programas`;
+        
+        // Controles
+        controls.innerHTML = '';
+        
+        // Botón anterior
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'page-btn';
+        prevBtn.innerHTML = '<i class="mdi mdi-chevron-left"></i>';
+        prevBtn.disabled = currentPage === 1;
+        prevBtn.onclick = () => changePage(currentPage - 1);
+        controls.appendChild(prevBtn);
+        
+        // Números de página
+        const pageNumbers = getPageNumbers(currentPage, totalPages);
+        pageNumbers.forEach(page => {
+            if (page === '...') {
+                const dots = document.createElement('span');
+                dots.className = 'page-dots';
+                dots.textContent = '...';
+                controls.appendChild(dots);
+            } else {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = 'page-btn' + (page === currentPage ? ' active' : '');
+                pageBtn.textContent = page;
+                pageBtn.onclick = () => changePage(page);
+                controls.appendChild(pageBtn);
+            }
+        });
+        
+        // Botón siguiente
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'page-btn';
+        nextBtn.innerHTML = '<i class="mdi mdi-chevron-right"></i>';
+        nextBtn.disabled = currentPage === totalPages;
+        nextBtn.onclick = () => changePage(currentPage + 1);
+        controls.appendChild(nextBtn);
+    }
 
-        function viewProgram(id) {
-            window.location.href = 'program-detail.php?id=' + id;
+    function getPageNumbers(current, total) {
+        const pages = [];
+        
+        if (total <= 7) {
+            for (let i = 1; i <= total; i++) {
+                pages.push(i);
+            }
+        } else {
+            if (current <= 3) {
+                pages.push(1, 2, 3, 4, '...', total);
+            } else if (current >= total - 2) {
+                pages.push(1, '...', total - 3, total - 2, total - 1, total);
+            } else {
+                pages.push(1, '...', current - 1, current, current + 1, '...', total);
+            }
         }
+        
+        return pages;
+    }
 
-        function editProgram(id) {
-            window.location.href = 'program-edit.php?id=' + id;
-        }
+    function changePage(page) {
+        currentPage = page;
+        applyFilters();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
-        function deleteProgram(id) {
-            Swal.fire({
-                title: '¿Eliminar programa?',
-                text: "Esta acción no se puede deshacer",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#737373',
-                confirmButtonText: 'Eliminar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Aquí iría tu lógica AJAX para eliminar
-                    Swal.fire({
-                        title: 'Eliminado',
-                        text: 'El programa ha sido eliminado',
-                        icon: 'success',
-                        confirmButtonColor: '#1a1a1a'
-                    });
-                }
-            });
-        }
-    </script>
+    function updateMetrics(visibleCards) {
+        const totalVisible = visibleCards.length;
+        const activeVisible = visibleCards.filter(card => card.querySelector('.status-active')).length;
+        const inactiveVisible = totalVisible - activeVisible;
+        const uniqueLineas = new Set(visibleCards.map(card => card.dataset.linea));
+        
+        document.getElementById('metricTotal').textContent = totalVisible;
+        document.getElementById('metricActive').textContent = activeVisible;
+        document.getElementById('metricInactive').textContent = inactiveVisible;
+        document.getElementById('metricLineas').textContent = uniqueLineas.size;
+    }
+
+    // Inicializar paginación al cargar
+    document.addEventListener('DOMContentLoaded', function() {
+        applyFilters();
+    });
+
+    function openAddProgramModal() {
+        Swal.fire({
+            title: 'Nuevo programa',
+            html: '<input id="programName" class="swal2-input" placeholder="Nombre del programa">',
+            showCancelButton: true,
+            confirmButtonText: 'Crear',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#1a1a1a',
+            cancelButtonColor: '#737373'
+        });
+    }
+
+    function viewProgram(id) {
+        window.location.href = 'program-view.php?id=' + id;
+    }
+
+    function editProgram(id) {
+        window.location.href = 'program-edit.php?id=' + id;
+    }
+
+    function deleteProgram(id) {
+        Swal.fire({
+            title: '¿Eliminar programa?',
+            text: "Esta acción no se puede deshacer",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#737373',
+            confirmButtonText: 'Eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Eliminado',
+                    text: 'El programa ha sido eliminado',
+                    icon: 'success',
+                    confirmButtonColor: '#1a1a1a'
+                });
+            }
+        });
+    }
+</script>
 </body>
 </html>
