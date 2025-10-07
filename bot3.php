@@ -740,5 +740,18 @@ try {
             }
         });
     </script>
+
+    <script>
+        // Ocultar sidebar al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar-minimal');
+            const mainPanel = document.querySelector('.main-panel');
+            
+            if (sidebar && mainPanel) {
+                sidebar.classList.add('collapsed');
+                mainPanel.classList.add('expanded');
+            }
+        });
+    </script>
 </body>
 </html>

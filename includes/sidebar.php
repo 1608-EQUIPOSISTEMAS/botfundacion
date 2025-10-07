@@ -237,7 +237,7 @@ function tieneRol($rol) {
         </li>
         
         <li class="nav-item">
-            <a class="nav-link" href="programas.php">
+            <a class="nav-link" href="programs.php">
                 <i class="mdi mdi-book-open-page-variant"></i>
                 <span>Programas</span>
             </a>
@@ -291,10 +291,10 @@ function tieneRol($rol) {
                 <span>Membresías</span>
             </a>
             <div class="nav-dropdown-menu">
-                <a class="nav-dropdown-item" href="black.php">Black</a>
-                <a class="nav-dropdown-item" href="gold.php">Gold</a>
-                <a class="nav-dropdown-item" href="platinum.php">Platinum</a>
-                <a class="nav-dropdown-item" href="plus.php">Plus</a>
+                <a class="nav-dropdown-item" href="member_black.php">Black</a>
+                <a class="nav-dropdown-item" href="member_gold.php">Gold</a>
+                <a class="nav-dropdown-item" href="member_platinum.php">Platinum</a>
+                <a class="nav-dropdown-item" href="member_plus.php">Plus</a>
             </div>
         </li>
         <?php endif; ?>

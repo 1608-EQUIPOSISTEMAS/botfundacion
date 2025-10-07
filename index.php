@@ -181,7 +181,7 @@ try {
     
 } catch(PDOException $e){
     $primer_mensaje = 'Bienvenido al Sistema';
-    $segundo_mensaje = 'Ingrese sus credenciales para acceder';
+    $segundo_mensaje = 'Ingrese sus credenciales';
     error_log("Error al obtener mensajes de login: " . $e->getMessage());
 }
 
@@ -194,25 +194,11 @@ try {
     <link rel="icon" href="<?php echo $rutaImagen; ?>" type="image/x-icon">
     <title><?php echo $pestaña; ?></title>
     
-    <!-- Fonts & Styles -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
     <style>
-        :root {
-            --primary-color: #845642;
-            --primary-hover: #444458;
-            --bg-gradient: linear-gradient(135deg, #e3f2fd 0%, #f5fbff 100%);
-            --card-shadow: 0 10px 30px rgba(0, 80, 130, 0.18);
-            --input-bg: rgba(249, 251, 253, 0.9);
-            --text-primary: #2d3a4a;
-            --text-secondary: #5a6a7a;
-            --border-radius: 12px;
-            --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -220,49 +206,44 @@ try {
         }
 
         body {
-            font-family: 'Poppins', 'Segoe UI', sans-serif;
-            background-image: url('fondo-hospital.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            background-blend-mode: overlay;
-            background-color: rgba(235, 245, 255, 0.6);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 24px;
+            color: #1a1a1a;
         }
 
         .login-container {
             width: 100%;
             max-width: 420px;
-            position: relative;
-            z-index: 1;
         }
 
         .card {
-            border: none;
-            border-radius: var(--border-radius);
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            box-shadow: var(--card-shadow);
-            padding: 35px;
-            transition: var(--transition-smooth);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 48px 40px;
+            box-shadow: 
+                0 10px 40px rgba(0, 0, 0, 0.08),
+                0 0 0 1px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
         }
 
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0, 80, 130, 0.25);
+            transform: translateY(-4px);
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.12),
+                0 0 0 1px rgba(0, 0, 0, 0.05);
         }
 
         .logo-container {
-            width: 140px;
-            height: 140px;
-            margin: 0 auto 20px;
-            perspective: 1000px;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 32px;
+            position: relative;
         }
 
         .logo {
@@ -270,89 +251,108 @@ try {
             height: 100%;
             object-fit: contain;
             border-radius: 50%;
-            border: 4px solid rgba(0, 119, 182, 0.8);
-            padding: 4px;
-            background-color: white;
-            box-shadow: 0 8px 20px rgba(0, 119, 182, 0.25);
-            transition: var(--transition-smooth);
+            border: 3px solid #667eea;
+            padding: 8px;
+            background: #ffffff;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 32px rgba(102, 126, 234, 0.35);
         }
 
         .title {
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 5px;
-            font-size: 1.7rem;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+            font-size: 26px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-align: center;
+            color: #1a1a1a;
         }
 
         .subtitle {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 25px;
-            letter-spacing: 0.2px;
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 36px;
+            text-align: center;
+            font-weight: 400;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .form-label {
-            font-weight: 600;
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            margin-bottom: 6px;
             display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #1a1a1a;
         }
 
         .form-control {
             width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #d1e3f5;
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
             border-radius: 10px;
-            font-size: 1rem;
-            transition: var(--transition-smooth);
-            background: var(--input-bg);
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
-            color: var(--text-primary);
+            font-size: 15px;
+            font-family: inherit;
+            color: #1a1a1a;
+            background: #ffffff;
+            transition: all 0.2s ease;
+            -webkit-appearance: none;
+        }
+
+        .form-control:hover {
+            border-color: #d1d5db;
         }
 
         .form-control:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(0, 119, 182, 0.15);
-            background: white;
             outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
         }
 
-        .btn-primary {
+        .form-control::placeholder {
+            color: #9ca3af;
+        }
+
+        .btn {
             width: 100%;
-            padding: 12px 15px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #0077b6 0%, #005f92 100%);
+            padding: 14px 16px;
             border: none;
-            color: white;
+            border-radius: 10px;
+            font-size: 15px;
             font-weight: 600;
-            font-size: 1rem;
-            letter-spacing: 0.5px;
-            margin-top: 10px;
-            transition: var(--transition-smooth);
-            box-shadow: 0 4px 15px rgba(0, 119, 182, 0.25);
+            font-family: inherit;
+            cursor: pointer;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 4px 12px rgba(102, 126, 234, 0.3),
+                0 0 0 0 rgba(102, 126, 234, 0);
             position: relative;
             overflow: hidden;
-            cursor: pointer;
         }
 
-        .btn-primary:hover {
+        .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 119, 182, 0.35);
-            background: linear-gradient(135deg, #0088cc 0%, #0077b6 100%);
+            box-shadow: 
+                0 8px 20px rgba(102, 126, 234, 0.4),
+                0 0 0 0 rgba(102, 126, 234, 0);
         }
 
-        .btn-primary:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 10px rgba(0, 119, 182, 0.2);
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 2px 8px rgba(102, 126, 234, 0.3),
+                0 0 0 0 rgba(102, 126, 234, 0);
         }
 
-        .btn-primary::after {
+        .btn::before {
             content: '';
             position: absolute;
             top: 0;
@@ -360,63 +360,100 @@ try {
             width: 100%;
             height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: 0.5s;
+            transition: left 0.5s;
         }
 
-        .btn-primary:hover::after {
+        .btn:hover::before {
             left: 100%;
+        }
+
+        .alert {
+            padding: 14px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 24px;
+            border: 2px solid;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-error {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #991b1b;
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+            color: #166534;
         }
 
         .footer-text {
             text-align: center;
-            margin-top: 20px;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
+            margin-top: 24px;
+            font-size: 14px;
+            color: #666;
         }
 
         .footer-text a {
-            color: var(--primary-color);
+            color: #667eea;
             text-decoration: none;
-            font-weight: 600;
-            transition: var(--transition-smooth);
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid transparent;
         }
 
         .footer-text a:hover {
-            color: var(--primary-hover);
-            text-decoration: underline;
+            color: #764ba2;
+            border-bottom-color: #764ba2;
         }
 
-        .alert-danger {
-            border-radius: 10px;
-            border-left: 4px solid #dc3545;
-            padding: 12px 15px;
-            margin-bottom: 20px;
-            background: rgba(220, 53, 69, 0.1);
-            animation: shake 0.5s ease-in-out;
+        .btn-close {
+            background: transparent;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            margin-left: auto;
+            padding: 0;
+            color: inherit;
+            opacity: 0.5;
+            transition: opacity 0.2s;
         }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        .btn-close:hover {
+            opacity: 1;
         }
 
         @media (max-width: 480px) {
             .card {
-                padding: 25px;
+                padding: 32px 24px;
             }
-            
+
             .logo-container {
-                width: 110px;
-                height: 110px;
+                width: 80px;
+                height: 80px;
             }
-            
+
             .title {
-                font-size: 1.5rem;
+                font-size: 22px;
             }
-            
-            .form-control {
-                padding: 10px 14px;
+
+            .subtitle {
+                font-size: 14px;
             }
         }
     </style>
@@ -424,34 +461,34 @@ try {
 <body>
     <div class="login-container">
         <div class="card">
-            <div class="text-center">
-                <div class="logo-container">
-                    <img src="<?php echo $rutaImagen; ?>" alt="Logo Sistema" class="logo" id="logo">
-                </div>
-                <h4 class="title"><?php echo $primer_mensaje; ?></h4>
-                <p class="subtitle"><?php echo $segundo_mensaje; ?></p>
+            <div class="logo-container">
+                <img src="<?php echo $rutaImagen; ?>" alt="Logo Sistema" class="logo">
             </div>
+            
+            <h1 class="title"><?php echo $primer_mensaje; ?></h1>
+            <p class="subtitle"><?php echo $segundo_mensaje; ?></p>
 
-            <!-- Mostrar mensajes de error -->
             <?php if(isset($_SESSION['error'])): ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <strong>⚠️ Error:</strong> <?php echo htmlspecialchars($_SESSION['error']); ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <div class="alert alert-error">
+                    <span>⚠️</span>
+                    <span><?php echo htmlspecialchars($_SESSION['error']); ?></span>
+                    <button type="button" class="btn-close" onclick="this.parentElement.remove()">×</button>
                 </div>
                 <?php unset($_SESSION['error']); ?>
             <?php endif; ?>
 
             <?php if(isset($_SESSION['mensaje_logout'])): ?>
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong>✅ Éxito:</strong> <?php echo htmlspecialchars($_SESSION['mensaje_logout']); ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <div class="alert alert-success">
+                    <span>✓</span>
+                    <span><?php echo htmlspecialchars($_SESSION['mensaje_logout']); ?></span>
+                    <button type="button" class="btn-close" onclick="this.parentElement.remove()">×</button>
                 </div>
                 <?php unset($_SESSION['mensaje_logout']); ?>
             <?php endif; ?>
 
             <form action="" method="POST" id="loginForm">
                 <div class="form-group">
-                    <label for="username" class="form-label">📧 Correo electrónico</label>
+                    <label for="username" class="form-label">Correo electrónico</label>
                     <input 
                         type="email" 
                         class="form-control" 
@@ -464,7 +501,7 @@ try {
                 </div>
                 
                 <div class="form-group">
-                    <label for="Password" class="form-label">🔒 Contraseña</label>
+                    <label for="Password" class="form-label">Contraseña</label>
                     <input 
                         type="password" 
                         class="form-control" 
@@ -475,8 +512,8 @@ try {
                         autocomplete="current-password">
                 </div>
                 
-                <button type="submit" class="btn btn-primary" name="acceder">
-                    🚀 Iniciar sesión
+                <button type="submit" class="btn" name="acceder">
+                    Iniciar sesión
                 </button>
             </form>
             
@@ -486,45 +523,7 @@ try {
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Efecto 3D para el logo
-        const logo = document.getElementById('logo');
-        const logoContainer = document.querySelector('.logo-container');
-        
-        if(logo && logoContainer) {
-            document.addEventListener('mousemove', (e) => {
-                const rect = logoContainer.getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
-                
-                const distanceX = e.clientX - centerX;
-                const distanceY = e.clientY - centerY;
-                const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-                
-                if (distance < rect.width * 2) {
-                    const maxRotation = 10;
-                    const rotateY = maxRotation * (distanceX / rect.width);
-                    const rotateX = -maxRotation * (distanceY / rect.height);
-                    
-                    requestAnimationFrame(() => {
-                        logo.style.transform = `
-                            perspective(1000px)
-                            rotateX(${rotateX}deg)
-                            rotateY(${rotateY}deg)
-                            scale(1.05)
-                        `;
-                    });
-                } else {
-                    logo.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
-                }
-            });
-            
-            document.addEventListener('mouseleave', () => {
-                logo.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
-            });
-        }
-
         // Auto-focus en el campo de email
         document.getElementById('username')?.focus();
 
@@ -539,7 +538,6 @@ try {
             }
             isSubmitting = true;
             
-            // Reactivar después de 3 segundos por si hay error
             setTimeout(() => {
                 isSubmitting = false;
             }, 3000);
