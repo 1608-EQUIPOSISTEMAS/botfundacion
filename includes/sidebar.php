@@ -261,6 +261,13 @@ function tieneRol($rol) {
                 <span>Segunda Línea</span>
             </a>
         </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="bot3.php">
+                <i class="mdi mdi-circle-outline"></i>
+                <span>Tercera Línea</span>
+            </a>
+        </li>
         
         <li class="nav-item">
             <a class="nav-link" href="fundacion.php">
