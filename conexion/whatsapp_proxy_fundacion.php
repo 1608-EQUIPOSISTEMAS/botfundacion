@@ -2,7 +2,7 @@
 header('Content-Type: application/json');
 
 // URL del servidor Node.js
-$NODE_SERVER = 'http://34.10.73.31:3001';
+$NODE_SERVER = 'http://34.10.73.31:3002';
 
 // Obtener la acción solicitada
 $action = $_GET['action'] ?? '';
