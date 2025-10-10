@@ -641,7 +641,7 @@ $(document).ready(function() {
         });
         
         $.ajax({
-            url: 'acciones/fundacion/obtener.php',
+            url: 'actions/fundacion/get-foundation.php',
             type: 'GET',
             data: { id: botId },
             dataType: 'json',

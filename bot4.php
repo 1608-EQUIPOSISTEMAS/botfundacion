@@ -29,7 +29,7 @@ switch($user_role) {
         $role_class = 'comercial';
         break;
     case 4: // Members
-        $user_permissions = ['members'];
+        $user_permissions = ['members', 'fundacion'];
         $role_name = 'Comercial';
         $role_class = 'comercial';
         break;

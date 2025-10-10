@@ -862,7 +862,7 @@ try {
                     });
                     
                     $.ajax({
-                        url: 'acciones/fundacion/editar.php',
+                        url: 'actions/fundacion/edit-foundation.php',
                         type: 'POST',
                         data: formData,
                         processData: false,

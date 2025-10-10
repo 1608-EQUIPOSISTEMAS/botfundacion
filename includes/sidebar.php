@@ -263,7 +263,7 @@ function tieneRol($rol) {
         </li>
 
         <li class="nav-item">
-            <a class="nav-link" href="bot3.php">
+            <a class="nav-link" href="bot4.php">
                 <i class="mdi mdi-circle-outline"></i>
                 <span>Tercera Línea</span>
             </a>
@@ -284,6 +284,50 @@ function tieneRol($rol) {
             <div class="nav-dropdown-menu">
                 <a class="nav-dropdown-item" href="información.php">Pagos</a>
                 <a class="nav-dropdown-item" href="dashboardinfo.php">Dashboard</a>
+            </div>
+        </li>
+        <?php endif; ?>
+
+        <!-- SECCIÓN INMOBILIARIA -->
+        <?php if(tienePermiso('inmobiliaria') || tienePermiso('all')): ?>
+        <li class="nav-section">Inmobiliaria</li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="bot2.php">
+                <i class="mdi mdi-circle-outline"></i>
+                <span>Primera Línea</span>
+            </a>
+        </li>
+        
+        <li class="nav-item">
+            <a class="nav-link" href="bot3.php">
+                <i class="mdi mdi-circle-outline"></i>
+                <span>Segunda Línea</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="bot4.php">
+                <i class="mdi mdi-circle-outline"></i>
+                <span>Tercera Línea</span>
+            </a>
+        </li>
+        
+        <li class="nav-item">
+            <a class="nav-link" href="fundacion.php">
+                <i class="mdi mdi-heart-outline"></i>
+                <span>Fundación</span>
+            </a>
+        </li>
+
+        <li class="nav-dropdown">
+            <a class="nav-link" href="#" onclick="toggleDropdown(this); return false;">
+                <i class="mdi mdi-file-chart"></i>
+                <span>Reportes</span>
+            </a>
+            <div class="nav-dropdown-menu">
+                <a class="nav-dropdown-item" href="real_estate.php">Pagos</a>
+                <a class="nav-dropdown-item" href="dashboard_real_estate.php">Dashboard</a>
             </div>
         </li>
         <?php endif; ?>
