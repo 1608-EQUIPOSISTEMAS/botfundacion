@@ -2,7 +2,7 @@
 session_start();
 require_once 'conexion/conexioninmobiliaria.php';
 
-$campaign_id = 1;
+$campaign_id = isset($_GET['id']) ? intval($_GET['id']) : 1;
 $user_name = isset($_SESSION['nombre']) ? $_SESSION['nombre'] : 'Usuario';
 
 // Obtener tipos de mensajes
@@ -863,7 +863,7 @@ $total_media = array_sum(array_column($messages_data, 'media_count'));
                         </div>
 
                         <!-- Vista Chat -->
-                        <div class="chat-container active" id="chatView">
+                        <div class="chat-container active" id="chatView" style="max-width: 1500px;">
                             <div class="chat-header">
                                 <div class="chat-avatar">WE</div>
                                 <div class="chat-info">
@@ -930,7 +930,7 @@ $total_media = array_sum(array_column($messages_data, 'media_count'));
                                         </div>
                                     </div>
 
-                                    <div class="bubble-actions">
+                                    <div class="bubble-actions" style="right: -10px;">
                                         <button class="bubble-action-btn media" onclick="manageMedia(<?php echo $msg['id']; ?>)" title="Gestionar archivos">
                                             <i class="mdi mdi-image-multiple"></i>
                                         </button>
@@ -993,9 +993,12 @@ $total_media = array_sum(array_column($messages_data, 'media_count'));
                                         <td><?php echo $msg['delay_seconds']; ?>s</td>
                                         <td>
                                             <div class="table-actions">
+                                                <?php if (!empty($msg['type_code']) && $msg['type_code'] === 'IMAGE' || $msg['type_code'] === 'GALLERY' || $msg['type_code'] === 'DOCUMENT' || $msg['type_code'] === 'AUDIO'): ?>
                                                 <button class="table-action-btn" onclick="manageMedia(<?php echo $msg['id']; ?>)" title="Media">
                                                     <i class="mdi mdi-image-multiple"></i>
                                                 </button>
+
+                                                <?php endif; ?>
                                                 <button class="table-action-btn" onclick="editMessage(<?php echo $msg['id']; ?>)" title="Editar">
                                                     <i class="mdi mdi-pencil"></i>
                                                 </button>
@@ -1017,7 +1020,8 @@ $total_media = array_sum(array_column($messages_data, 'media_count'));
     </div>
 
     <!-- Modal de Nuevo Mensaje -->
-    <?php include 'modals/messages/message-create-modal.php'; ?>
+    <?php include 'modals/messages/modal_add.php'; ?>
+    <?php include 'modals/messages/modal_media.php'; ?>
 
     <script src="assets/vendors/js/vendor.bundle.base.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
@@ -1263,24 +1267,6 @@ $total_media = array_sum(array_column($messages_data, 'media_count'));
                     confirmButtonText: 'Entendido'
                 });
             });
-        }
-
-        // Abrir modal de nuevo mensaje
-        function openNewMessageModal() {
-            Swal.fire({
-                icon: 'info',
-                title: 'Próximamente',
-                text: 'El modal de creación de mensajes estará disponible pronto',
-                confirmButtonText: 'Entendido'
-            });
-        }
-
-        function manageMedia(id) {
-            window.location.href = 'message-media.php?id=' + id;
-        }
-
-        function editMessage(id) {
-            window.location.href = 'message-edit.php?id=' + id;
         }
 
         function deleteMessage(id) {

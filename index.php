@@ -116,7 +116,7 @@ if(isset($_POST['acceder'])){
                     if ($usuario['rol_nombre'] === 'fundacion') {
                         header('Location: bot2.php');
                     } elseif ($usuario['rol_nombre'] === 'inmobiliaria') {
-                        header('Location: bot5.php');
+                        header('Location: bot_realestate.php');
                     } else {
                         header('Location: bot.php');
                     }

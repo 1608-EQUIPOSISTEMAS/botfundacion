@@ -292,9 +292,17 @@ function tieneRol($rol) {
         <li class="nav-section">Inmobiliaria</li>
 
         <li class="nav-item">
-            <a class="nav-link" href="bot5.php">
+            <a class="nav-link" href="bot_realestate.php">
                 <i class="mdi mdi-circle-outline"></i>
                 <span>Primera Línea</span>
+            </a>
+        </li>
+
+        
+        <li class="nav-item">
+            <a class="nav-link" href="bot_realestate2.php">
+                <i class="mdi mdi-circle-outline"></i>
+                <span>Segunda Línea</span>
             </a>
         </li>
 
@@ -304,8 +312,8 @@ function tieneRol($rol) {
                 <span>Inmobiliaria</span>
             </a>
             <div class="nav-dropdown-menu">
-                <a class="nav-dropdown-item" href="campaigns.php">Mensajes</a>
-                <a class="nav-dropdown-item" href="dashboard_real_estate.php">Dashboard</a>
+                <a class="nav-dropdown-item" href="dashboard_realestate.php">Analisis</a>
+                <a class="nav-dropdown-item" href="bloqueados_realestate.php">Bloqueados</a>
             </div>
         </li>
         <?php endif; ?>

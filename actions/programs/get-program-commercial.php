@@ -19,9 +19,7 @@
 
         $sql = "SELECT 
                     program_id,
-                    json_references,
                     initial_greeting,
-                    brochure_url,
                     voice_url,
                     benefits,
                     video_url,
