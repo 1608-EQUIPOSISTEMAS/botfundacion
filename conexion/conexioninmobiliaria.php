@@ -11,5 +11,6 @@ try {
     // Configurar atributos de PDO
     $pdoInmobiliaria->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
+    
 }
 ?>
