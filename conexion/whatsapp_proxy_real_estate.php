@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // URL del servidor Node.js
-$NODE_SERVER = 'http://34.10.73.31:3001';
+$NODE_SERVER = 'http://34.42.193.17:3001';
 
 // Obtener la acción solicitada
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
