@@ -248,30 +248,16 @@ function tieneRol($rol) {
         <li class="nav-section">Fundación</li>
         
         <li class="nav-item">
-            <a class="nav-link" href="bot2.php">
+            <a class="nav-link" href="bot_fundation.php">
                 <i class="mdi mdi-circle-outline"></i>
                 <span>Primera Línea</span>
             </a>
         </li>
         
         <li class="nav-item">
-            <a class="nav-link" href="bot3.php">
+            <a class="nav-link" href="bot_fundation2.php">
                 <i class="mdi mdi-circle-outline"></i>
                 <span>Segunda Línea</span>
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link" href="bot4.php">
-                <i class="mdi mdi-circle-outline"></i>
-                <span>Tercera Línea</span>
-            </a>
-        </li>
-        
-        <li class="nav-item">
-            <a class="nav-link" href="fundacion.php">
-                <i class="mdi mdi-heart-outline"></i>
-                <span>Fundación</span>
             </a>
         </li>
 
@@ -306,10 +292,17 @@ function tieneRol($rol) {
             </a>
         </li>
 
+        <li class="nav-item">
+            <a class="nav-link" href="bot_realestate3.php">
+                <i class="mdi mdi-circle-outline"></i>
+                <span>Tercera Línea</span>
+            </a>
+        </li>
+
         <li class="nav-dropdown">
             <a class="nav-link" href="#" onclick="toggleDropdown(this); return false;">
                 <i class="mdi mdi-file-chart"></i>
-                <span>Inmobiliaria</span>
+                <span>Información</span>
             </a>
             <div class="nav-dropdown-menu">
                 <a class="nav-dropdown-item" href="dashboard_realestate.php">Analisis</a>
