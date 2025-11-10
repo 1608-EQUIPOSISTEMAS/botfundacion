@@ -1020,9 +1020,9 @@ $total_media = array_sum(array_column($messages_data, 'media_count'));
     </div>
 
     <!-- Modal de Nuevo Mensaje -->
-    <?php include 'modals/messages/modal_add.php'; ?>
-    <?php include 'modals/messages/modal_media.php'; ?>
-
+    <?php include 'modals/messagesfundation/modal_add.php'; ?>
+    <?php include 'modals/messagesfundation/modal_media.php'; ?>
+    <!-- Scripts JS -->
     <script src="assets/vendors/js/vendor.bundle.base.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
@@ -1221,7 +1221,7 @@ $total_media = array_sum(array_column($messages_data, 'media_count'));
         function saveOrder(newOrder) {
             console.log('Enviando a servidor:', newOrder);
             
-            fetch('actions/messages/reorder-messages.php', {
+            fetch('actions/messagesfundation/reorder-messages.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1281,7 +1281,7 @@ $total_media = array_sum(array_column($messages_data, 'media_count'));
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch('actions/messages/delete-message.php', {
+                    fetch('actions/messagesfundation/delete-message.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
