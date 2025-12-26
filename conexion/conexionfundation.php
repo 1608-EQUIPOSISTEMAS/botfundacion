@@ -1,9 +1,9 @@
 <?php
-$host = "shortline.proxy.rlwy.net";
-$port = 25719;
+$host = "crossover.proxy.rlwy.net";
+$port = 16414;
 $dbname = "railway";
 $user = "root";
-$password = "tZQeEBUDYbCQJfkSABsyIlXNcvTTQDoK";
+$password = "JUJHcePSZPDvZyavSSTckDJyozccyYtg";
 
 try {
     $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4";
